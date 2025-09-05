@@ -1,40 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Pet Check Design System - Modern pet care colors and styling */
 
 @layer base {
   :root {
+    /* Pet Check Brand Colors */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --foreground: 240 8% 20%;
+    
+    /* Pet Care Theme Colors */
+    --pet-primary: 200 80% 85%; /* Azul bebê */
+    --pet-primary-foreground: 240 8% 20%;
+    --pet-secondary: 45 20% 95%; /* Bege suave */
+    --pet-secondary-foreground: 240 8% 20%;
+    --pet-accent: 150 30% 88%; /* Verde suave para saúde */
+    --pet-accent-foreground: 240 8% 20%;
+    
+    /* Updated Semantic Colors for Pet Check */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 240 8% 20%;
+    
+    --primary: 200 80% 85%; /* Pet primary (azul bebê) */
+    --primary-foreground: 240 8% 20%;
+    
+    --secondary: 45 20% 95%; /* Pet secondary (bege suave) */
+    --secondary-foreground: 240 8% 20%;
+    
+    --accent: 150 30% 88%; /* Pet accent (verde suave) */
+    --accent-foreground: 240 8% 20%;
+    
+    --muted: 220 14% 96%;
+    --muted-foreground: 240 5% 65%;
+    
+    /* Pet Care Gradients */
+    --gradient-pet: linear-gradient(135deg, hsl(var(--pet-primary)), hsl(var(--pet-accent)));
+    --gradient-care: linear-gradient(180deg, hsl(var(--pet-secondary)), hsl(var(--background)));
+    
+    /* Shadows and Effects */
+    --shadow-pet: 0 8px 25px -8px hsl(var(--pet-primary) / 0.3);
+    --shadow-card: 0 4px 15px -3px hsl(220 8% 15% / 0.1);
+    
+    /* Pet Care specific colors */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --popover-foreground: 240 8% 20%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 200 80% 85%;
+    
+    /* Pet Care Animation Variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --animation-float: float 3s ease-in-out infinite;
 
     --radius: 0.5rem;
 
@@ -100,6 +124,49 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-['Inter'];
+  }
+}
+
+@layer components {
+  /* Pet Check Custom Components */
+  .pet-card {
+    @apply bg-card rounded-2xl p-6 shadow-[0_4px_15px_-3px_hsl(220_8%_15%_/_0.1)] border border-border/50;
+    transition: var(--transition-smooth);
+  }
+  
+  .pet-card:hover {
+    @apply shadow-[0_8px_25px_-8px_hsl(var(--pet-primary)_/_0.3)] -translate-y-1;
+  }
+  
+  .pet-button {
+    @apply bg-primary text-primary-foreground rounded-full px-6 py-3 font-medium;
+    @apply hover:shadow-[0_8px_25px_-8px_hsl(var(--pet-primary)_/_0.4)];
+    @apply transform transition-all duration-300 hover:-translate-y-0.5;
+  }
+  
+  .pet-input {
+    @apply border border-input bg-background rounded-xl px-4 py-3;
+    @apply focus:ring-2 focus:ring-primary/20 focus:border-primary;
+    transition: var(--transition-smooth);
+  }
+}
+
+@layer utilities {
+  .gradient-pet {
+    background: linear-gradient(135deg, hsl(var(--pet-primary)), hsl(var(--pet-accent)));
+  }
+  
+  .gradient-care {
+    background: linear-gradient(180deg, hsl(var(--pet-secondary)), hsl(var(--background)));
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
   }
 }
