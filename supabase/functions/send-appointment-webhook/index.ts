@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { format } from "https://esm.sh/date-fns@3.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -53,12 +54,17 @@ serve(async (req) => {
     }
 
     // Format data for webhook
+    const appointmentDate = new Date(appointment.appointment_date);
+    const dataFormatada = format(appointmentDate, "dd/MM/yyyy");
+    const horarioFormatado = format(appointmentDate, "HH:mm");
+    
     const webhookPayload = {
       nome_tutor: appointment.tutor_name,
       telefone: appointment.phone,
       nome_pet: appointment.pet_name,
       servico: appointment.service,
-      data_hora: appointment.appointment_date,
+      data: dataFormatada,
+      horario: horarioFormatado,
     };
 
     console.log("Sending to webhook:", config.webhook_url);
