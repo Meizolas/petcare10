@@ -53,10 +53,12 @@ serve(async (req) => {
       );
     }
 
-    // Format data for webhook
+    // Format data for webhook - adjust from UTC to Brazil timezone (UTC-3)
     const appointmentDate = new Date(appointment.appointment_date);
-    const dataFormatada = format(appointmentDate, "dd/MM/yyyy");
-    const horarioFormatado = format(appointmentDate, "HH:mm");
+    // Convert from UTC to Brazil timezone (subtract 3 hours from UTC)
+    const brazilDate = new Date(appointmentDate.getTime() - (3 * 60 * 60 * 1000));
+    const dataFormatada = format(brazilDate, "dd/MM/yyyy");
+    const horarioFormatado = format(brazilDate, "HH:mm");
     
     const webhookPayload = {
       nome_tutor: appointment.tutor_name,
