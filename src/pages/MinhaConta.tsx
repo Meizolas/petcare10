@@ -3,15 +3,22 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, Upload, User } from 'lucide-react';
 
 export default function MinhaConta() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -33,6 +40,52 @@ export default function MinhaConta() {
     if (appointmentsRes.data) setAppointments(appointmentsRes.data);
   };
 
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploading(true);
+
+      if (!event.target.files || event.target.files.length === 0) {
+        return;
+      }
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user!.id}/${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user!.id);
+
+      if (updateError) throw updateError;
+
+      setProfile({ ...profile, avatar_url: publicUrl });
+
+      toast({
+        title: 'Sucesso!',
+        description: 'Foto de perfil atualizada.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -45,10 +98,39 @@ export default function MinhaConta() {
             <CardHeader>
               <CardTitle>Dados Pessoais</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <p><strong>Nome:</strong> {profile?.full_name}</p>
-              <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Telefone:</strong> {profile?.phone}</p>
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-6">
+                <Avatar className="w-24 h-24">
+                  <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
+                  <AvatarFallback className="bg-purple-100 text-purple-600 text-2xl">
+                    <User className="w-12 h-12" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <Label htmlFor="avatar" className="cursor-pointer">
+                    <div className="flex items-center gap-2 pet-button inline-flex">
+                      <Upload className="w-4 h-4" />
+                      {uploading ? 'Enviando...' : 'Alterar Foto'}
+                    </div>
+                  </Label>
+                  <Input
+                    id="avatar"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
+                    JPG, PNG ou WEBP. Máx 5MB.
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p><strong>Nome:</strong> {profile?.full_name}</p>
+                <p><strong>Email:</strong> {user.email}</p>
+                <p><strong>Telefone:</strong> {profile?.phone}</p>
+              </div>
             </CardContent>
           </Card>
 

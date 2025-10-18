@@ -1,13 +1,35 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Heart, User, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function PetCareHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const location = useLocation();
   const { user, signOut, isAdmin } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      loadAvatar();
+    }
+  }, [user]);
+
+  const loadAvatar = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('id', user.id)
+      .single();
+    
+    if (data?.avatar_url) {
+      setAvatarUrl(data.avatar_url);
+    }
+  };
 
   const navLinks = [
     { name: 'Início', href: '/' },
@@ -49,13 +71,14 @@ export default function PetCareHeader() {
               <>
                 <Link
                   to="/minha-conta"
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                    isActive('/minha-conta')
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'text-foreground hover:bg-muted'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-muted"
                 >
-                  <User className="h-4 w-4 inline mr-2" />
+                  <Avatar className="w-6 h-6">
+                    <AvatarImage src={avatarUrl || ''} />
+                    <AvatarFallback className="bg-purple-100 text-purple-600 text-xs">
+                      <User className="w-3 h-3" />
+                    </AvatarFallback>
+                  </Avatar>
                   Minha Conta
                 </Link>
                 {isAdmin && (
