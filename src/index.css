@@ -164,7 +164,7 @@
   }
   
   .service-card {
-    @apply pet-card group cursor-pointer;
+    @apply pet-card cursor-pointer;
   }
   
   .service-icon {
