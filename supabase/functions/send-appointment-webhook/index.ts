@@ -13,14 +13,36 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.error("Missing Authorization header");
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // Get authenticated user
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error("Authentication failed:", authError);
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 401 }
+      );
+    }
+
     const { appointmentId } = await req.json();
 
-    console.log("Processing webhook for appointment:", appointmentId);
+    console.log("Processing webhook for appointment:", appointmentId, "by user:", user.id);
 
     // Get appointment data
     const { data: appointment, error: appointmentError } = await supabase
@@ -30,8 +52,33 @@ serve(async (req) => {
       .single();
 
     if (appointmentError) {
-      throw new Error(`Failed to fetch appointment: ${appointmentError.message}`);
+      console.error("Failed to fetch appointment:", appointmentError);
+      return new Response(
+        JSON.stringify({ success: false, error: "Appointment not found" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
+      );
     }
+
+    // Verify appointment ownership or admin status
+    const { data: userRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    const isAdmin = !!userRole;
+    const isOwner = appointment.user_id === user.id;
+
+    if (!isOwner && !isAdmin) {
+      console.error("Authorization failed: User", user.id, "attempted to access appointment", appointmentId);
+      return new Response(
+        JSON.stringify({ success: false, error: "Forbidden: You don't have permission to trigger webhook for this appointment" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
+      );
+    }
+
+    console.log("Authorization passed:", isAdmin ? "Admin access" : "Owner access");
 
     // Get webhook config
     const { data: config, error: configError } = await supabase
