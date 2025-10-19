@@ -70,17 +70,35 @@ export default function Admin() {
 
   const handleConfirmAppointment = async (appointmentId: string) => {
     try {
-      const { error } = await supabase
+      // Atualiza o status do agendamento
+      const { error: updateError } = await supabase
         .from("appointments")
         .update({ status: "confirmed" })
         .eq("id", appointmentId);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
-      toast({
-        title: "Agendamento confirmado!",
-        description: "O status foi atualizado com sucesso.",
-      });
+      // Dispara o webhook com os dados do agendamento confirmado
+      const { error: webhookError } = await supabase.functions.invoke(
+        "send-appointment-webhook",
+        {
+          body: { appointmentId },
+        }
+      );
+
+      if (webhookError) {
+        console.error("Erro ao enviar webhook:", webhookError);
+        toast({
+          title: "Agendamento confirmado!",
+          description: "Status atualizado, mas houve um problema ao enviar a notificação.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Agendamento confirmado!",
+          description: "O status foi atualizado e a notificação foi enviada com sucesso.",
+        });
+      }
 
       fetchAppointments();
     } catch (error) {
