@@ -34,6 +34,7 @@ export default function PetCareHeader() {
   const navLinks = [
     { name: 'Início', href: '/' },
     { name: 'Serviços', href: '/servicos' },
+    { name: 'Planos', href: '/planos' },
     { name: 'Agendar', href: '/agendar' },
     { name: 'Contato', href: '/contato' },
   ];

@@ -1,7 +1,22 @@
 import { Syringe, Scissors, Heart, Stethoscope, Pill, Bath } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Servicos() {
+  const [selectedService, setSelectedService] = useState<any>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const { toast } = useToast();
   const services = [
     {
       icon: Stethoscope,
@@ -47,6 +62,32 @@ export default function Servicos() {
     },
   ];
 
+  const handleSelectService = (service: any) => {
+    setSelectedService(service);
+    setPaymentMethod('');
+  };
+
+  const handlePayment = () => {
+    if (!paymentMethod) {
+      toast({
+        title: 'Selecione uma forma de pagamento',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    toast({
+      title: 'Pagamento confirmado!',
+      description: `Serviço ${selectedService.title} - Pagamento via ${
+        paymentMethod === 'credit' ? 'Cartão de Crédito' : 
+        paymentMethod === 'debit' ? 'Cartão de Débito' : 'PIX'
+      }.`,
+    });
+
+    setSelectedService(null);
+    setPaymentMethod('');
+  };
+
   return (
     <div className="min-h-screen py-20">
       <div className="container mx-auto px-4">
@@ -77,7 +118,13 @@ export default function Servicos() {
               </p>
               
               <div className="text-center">
-                <p className="text-primary font-semibold text-lg">{service.price}</p>
+                <p className="text-primary font-semibold text-lg mb-4">{service.price}</p>
+                <Button 
+                  onClick={() => handleSelectService(service)}
+                  className="w-full"
+                >
+                  Contratar Serviço
+                </Button>
               </div>
             </div>
           ))}
@@ -127,6 +174,59 @@ export default function Servicos() {
           </div>
         </div>
       </div>
+
+      {/* Payment Dialog */}
+      <Dialog open={!!selectedService} onOpenChange={() => setSelectedService(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Finalizar Pagamento</DialogTitle>
+            <DialogDescription>
+              {selectedService?.title} - {selectedService?.price}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label className="text-base font-semibold mb-3 block">
+                Escolha a forma de pagamento:
+              </Label>
+              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
+                  <RadioGroupItem value="credit" id="credit" />
+                  <Label htmlFor="credit" className="cursor-pointer flex-1">
+                    💳 Cartão de Crédito
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
+                  <RadioGroupItem value="debit" id="debit" />
+                  <Label htmlFor="debit" className="cursor-pointer flex-1">
+                    💳 Cartão de Débito
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
+                  <RadioGroupItem value="pix" id="pix" />
+                  <Label htmlFor="pix" className="cursor-pointer flex-1">
+                    📱 PIX
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setSelectedService(null)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button onClick={handlePayment} className="flex-1">
+                Confirmar Pagamento
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

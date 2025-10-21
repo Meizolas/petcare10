@@ -8,6 +8,7 @@ import PetCareHeader from "./components/PetCareHeader";
 import PetCareFooter from "./components/PetCareFooter";
 import PetCareHome from "./pages/PetCareHome";
 import Servicos from "./pages/Servicos";
+import Planos from "./pages/Planos";
 import Agendar from "./pages/Agendar";
 import Contato from "./pages/Contato";
 import Auth from "./pages/Auth";
@@ -30,6 +31,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<PetCareHome />} />
                 <Route path="/servicos" element={<Servicos />} />
+                <Route path="/planos" element={<Planos />} />
                 <Route path="/agendar" element={<Agendar />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/auth" element={<Auth />} />
