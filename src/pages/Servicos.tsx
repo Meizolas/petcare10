@@ -12,52 +12,60 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Servicos() {
   const [selectedService, setSelectedService] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   const services = [
     {
       icon: Stethoscope,
       title: 'Consulta Veterinária',
       description: 'Atendimento completo com veterinários especializados para diagnóstico e tratamento.',
-      price: 'A partir de R$ 150',
+      price: 'R$ 150,00',
+      priceId: 'price_1SKUppAkAqy6bQ076P7Th7lx',
       color: 'from-primary to-primary-glow',
     },
     {
       icon: Syringe,
       title: 'Vacinação',
       description: 'Vacinas essenciais para manter seu pet protegido contra doenças.',
-      price: 'A partir de R$ 80',
+      price: 'R$ 80,00',
+      priceId: 'price_1SKUq7AkAqy6bQ07kur9QWcO',
       color: 'from-accent to-secondary',
     },
     {
       icon: Scissors,
       title: 'Banho e Tosa',
       description: 'Serviço completo de higiene e estética para seu pet ficar ainda mais bonito.',
-      price: 'A partir de R$ 100',
+      price: 'R$ 100,00',
+      priceId: 'price_1SKUqNAkAqy6bQ07DB9xBdo2',
       color: 'from-secondary to-brand-orange',
     },
     {
       icon: Bath,
       title: 'Banho Terapêutico',
       description: 'Tratamento especial para pets com problemas de pele ou alergias.',
-      price: 'A partir de R$ 120',
+      price: 'R$ 120,00',
+      priceId: 'price_1SKUqcAkAqy6bQ07UYGOi2zC',
       color: 'from-primary to-accent',
     },
     {
       icon: Pill,
       title: 'Vermifugação',
       description: 'Prevenção e tratamento contra vermes e parasitas intestinais.',
-      price: 'A partir de R$ 60',
+      price: 'R$ 60,00',
+      priceId: 'price_1SKUqoAkAqy6bQ07ugSX0V8Y',
       color: 'from-accent to-brand-orange',
     },
     {
       icon: Heart,
       title: 'Check-up Completo',
       description: 'Exame geral de saúde com avaliação detalhada do seu pet.',
-      price: 'A partir de R$ 200',
+      price: 'R$ 200,00',
+      priceId: 'price_1SKUr0AkAqy6bQ07ON3zEjuy',
       color: 'from-primary to-secondary',
     },
   ];
@@ -67,25 +75,42 @@ export default function Servicos() {
     setPaymentMethod('');
   };
 
-  const handlePayment = () => {
-    if (!paymentMethod) {
+  const handlePayment = async () => {
+    if (!selectedService?.priceId) {
       toast({
-        title: 'Selecione uma forma de pagamento',
+        title: 'Erro',
+        description: 'Serviço inválido. Tente novamente.',
         variant: 'destructive',
       });
       return;
     }
 
-    toast({
-      title: 'Pagamento confirmado!',
-      description: `Serviço ${selectedService.title} - Pagamento via ${
-        paymentMethod === 'credit' ? 'Cartão de Crédito' : 
-        paymentMethod === 'debit' ? 'Cartão de Débito' : 'PIX'
-      }.`,
-    });
+    setIsProcessing(true);
 
-    setSelectedService(null);
-    setPaymentMethod('');
+    try {
+      console.log('Creating checkout session for:', selectedService.title);
+      
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId: selectedService.priceId },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL de checkout não retornada');
+      }
+    } catch (error) {
+      console.error('Erro ao processar pagamento:', error);
+      toast({
+        title: 'Erro ao processar pagamento',
+        description: error.message || 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -176,7 +201,7 @@ export default function Servicos() {
       </div>
 
       {/* Payment Dialog */}
-      <Dialog open={!!selectedService} onOpenChange={() => setSelectedService(null)}>
+      <Dialog open={!!selectedService} onOpenChange={() => !isProcessing && setSelectedService(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Finalizar Pagamento</DialogTitle>
@@ -186,30 +211,15 @@ export default function Servicos() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div>
-              <Label className="text-base font-semibold mb-3 block">
-                Escolha a forma de pagamento:
-              </Label>
-              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
-                  <RadioGroupItem value="credit" id="credit" />
-                  <Label htmlFor="credit" className="cursor-pointer flex-1">
-                    💳 Cartão de Crédito
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
-                  <RadioGroupItem value="debit" id="debit" />
-                  <Label htmlFor="debit" className="cursor-pointer flex-1">
-                    💳 Cartão de Débito
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
-                  <RadioGroupItem value="pix" id="pix" />
-                  <Label htmlFor="pix" className="cursor-pointer flex-1">
-                    📱 PIX
-                  </Label>
-                </div>
-              </RadioGroup>
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm text-blue-900 dark:text-blue-100">
+                Você será redirecionado para o checkout seguro do Stripe onde poderá:
+              </p>
+              <ul className="text-sm text-blue-800 dark:text-blue-200 mt-2 space-y-1 list-disc list-inside">
+                <li>Pagar com cartão de crédito (até 12x sem juros)</li>
+                <li>Pagar com cartão de débito</li>
+                <li>Pagar com boleto bancário</li>
+              </ul>
             </div>
 
             <div className="flex gap-3">
@@ -217,11 +227,16 @@ export default function Servicos() {
                 variant="outline"
                 onClick={() => setSelectedService(null)}
                 className="flex-1"
+                disabled={isProcessing}
               >
                 Cancelar
               </Button>
-              <Button onClick={handlePayment} className="flex-1">
-                Confirmar Pagamento
+              <Button 
+                onClick={handlePayment} 
+                className="flex-1"
+                disabled={isProcessing}
+              >
+                {isProcessing ? 'Processando...' : 'Ir para Pagamento'}
               </Button>
             </div>
           </div>

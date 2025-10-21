@@ -14,6 +14,7 @@ import Contato from "./pages/Contato";
 import Auth from "./pages/Auth";
 import MinhaConta from "./pages/MinhaConta";
 import Admin from "./pages/Admin";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/minha-conta" element={<MinhaConta />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

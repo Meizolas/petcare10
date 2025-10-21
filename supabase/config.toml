@@ -1,1 +1,5 @@
 project_id = "lwuweqqadnabwmmpredr"
+
+[functions.send-appointment-webhook]
+
+[functions.create-checkout]
