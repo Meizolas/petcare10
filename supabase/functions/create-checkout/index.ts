@@ -14,13 +14,13 @@ serve(async (req) => {
   }
 
   try {
-    const { priceId } = await req.json();
+    const { priceId, mode = 'payment' } = await req.json();
     
     if (!priceId) {
       throw new Error("Price ID is required");
     }
 
-    console.log("Creating checkout session for price:", priceId);
+    console.log("Creating checkout session for price:", priceId, "mode:", mode);
 
     // Get user from auth header if present (optional for checkout)
     let userEmail = null;
@@ -59,7 +59,7 @@ serve(async (req) => {
     const origin = req.headers.get("origin") || "http://localhost:5173";
 
     // Create checkout session with Brazilian payment methods
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: any = {
       customer: customerId || undefined,
       customer_email: customerId ? undefined : userEmail || undefined,
       line_items: [
@@ -68,10 +68,16 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
-      mode: "payment",
+      mode: mode,
       payment_method_types: ["card", "boleto"],
-      // Enable installments for credit cards (up to 12x for Brazil)
-      payment_method_options: {
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: mode === 'subscription' ? `${origin}/planos` : `${origin}/servicos`,
+      locale: "pt-BR",
+    };
+
+    // Enable installments for credit cards (up to 12x for Brazil) only for payment mode
+    if (mode === "payment") {
+      sessionConfig.payment_method_options = {
         card: {
           installments: {
             enabled: true,
@@ -82,11 +88,10 @@ serve(async (req) => {
             },
           },
         },
-      },
-      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/servicos`,
-      locale: "pt-BR",
-    });
+      };
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     console.log("Checkout session created:", session.id);
 

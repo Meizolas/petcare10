@@ -12,10 +12,12 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Planos() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
   const plans = [
@@ -25,6 +27,7 @@ export default function Planos() {
       price: 'R$ 99',
       period: '/mês',
       description: 'Perfeito para pets que precisam de cuidados essenciais',
+      priceId: 'price_1SLEVRAkAqy6bQ07dqXjHsfm',
       color: 'from-primary to-primary-glow',
       features: [
         '1 Consulta veterinária por mês',
@@ -40,6 +43,7 @@ export default function Planos() {
       price: 'R$ 199',
       period: '/mês',
       description: 'Ideal para tutores que querem mais benefícios',
+      priceId: 'price_1SLEWcPSIQsRBK24SlBCzhgS',
       color: 'from-accent to-secondary',
       popular: true,
       features: [
@@ -58,6 +62,7 @@ export default function Planos() {
       price: 'R$ 349',
       period: '/mês',
       description: 'O melhor cuidado para o seu melhor amigo',
+      priceId: 'price_1SLEWmAkAqy6bQ070Y3sTzXW',
       color: 'from-secondary to-brand-orange',
       features: [
         'Consultas veterinárias ilimitadas',
@@ -77,25 +82,45 @@ export default function Planos() {
     setPaymentMethod('');
   };
 
-  const handlePayment = () => {
-    if (!paymentMethod) {
+  const handlePayment = async () => {
+    if (!selectedPlan?.priceId) {
       toast({
-        title: 'Selecione uma forma de pagamento',
+        title: 'Erro',
+        description: 'Plano inválido. Tente novamente.',
         variant: 'destructive',
       });
       return;
     }
 
-    toast({
-      title: 'Plano selecionado!',
-      description: `Você escolheu o plano ${selectedPlan.name} com pagamento via ${
-        paymentMethod === 'credit' ? 'Cartão de Crédito' : 
-        paymentMethod === 'debit' ? 'Cartão de Débito' : 'PIX'
-      }.`,
-    });
+    setIsProcessing(true);
 
-    setSelectedPlan(null);
-    setPaymentMethod('');
+    try {
+      console.log('Creating checkout session for:', selectedPlan.name);
+      
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { 
+          priceId: selectedPlan.priceId,
+          mode: 'subscription'
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL de checkout não retornada');
+      }
+    } catch (error) {
+      console.error('Erro ao processar pagamento:', error);
+      toast({
+        title: 'Erro ao processar pagamento',
+        description: error.message || 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -191,7 +216,7 @@ export default function Planos() {
       </div>
 
       {/* Payment Dialog */}
-      <Dialog open={!!selectedPlan} onOpenChange={() => setSelectedPlan(null)}>
+      <Dialog open={!!selectedPlan} onOpenChange={() => !isProcessing && setSelectedPlan(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Finalizar Assinatura</DialogTitle>
@@ -201,30 +226,15 @@ export default function Planos() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div>
-              <Label className="text-base font-semibold mb-3 block">
-                Escolha a forma de pagamento:
-              </Label>
-              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
-                  <RadioGroupItem value="credit" id="credit" />
-                  <Label htmlFor="credit" className="cursor-pointer flex-1">
-                    💳 Cartão de Crédito
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
-                  <RadioGroupItem value="debit" id="debit" />
-                  <Label htmlFor="debit" className="cursor-pointer flex-1">
-                    💳 Cartão de Débito
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted cursor-pointer">
-                  <RadioGroupItem value="pix" id="pix" />
-                  <Label htmlFor="pix" className="cursor-pointer flex-1">
-                    📱 PIX
-                  </Label>
-                </div>
-              </RadioGroup>
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm text-blue-900 dark:text-blue-100">
+                Você será redirecionado para o checkout seguro do Stripe onde poderá:
+              </p>
+              <ul className="text-sm text-blue-800 dark:text-blue-200 mt-2 space-y-1 list-disc list-inside">
+                <li>Pagar com cartão de crédito (até 12x sem juros)</li>
+                <li>Pagar com cartão de débito</li>
+                <li>Pagar com boleto bancário</li>
+              </ul>
             </div>
 
             <div className="flex gap-3">
@@ -232,11 +242,16 @@ export default function Planos() {
                 variant="outline"
                 onClick={() => setSelectedPlan(null)}
                 className="flex-1"
+                disabled={isProcessing}
               >
                 Cancelar
               </Button>
-              <Button onClick={handlePayment} className="flex-1">
-                Confirmar Pagamento
+              <Button 
+                onClick={handlePayment} 
+                className="flex-1"
+                disabled={isProcessing}
+              >
+                {isProcessing ? 'Processando...' : 'Ir para Pagamento'}
               </Button>
             </div>
           </div>
