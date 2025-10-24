@@ -75,17 +75,12 @@ serve(async (req) => {
       locale: "pt-BR",
     };
 
-    // Enable installments for credit cards (up to 12x for Brazil) only for payment mode
+    // Enable installments for credit cards (Brazil) only for payment mode
     if (mode === "payment") {
       sessionConfig.payment_method_options = {
         card: {
           installments: {
             enabled: true,
-            plan: {
-              count: 12,
-              interval: "month",
-              type: "fixed_count",
-            },
           },
         },
       };
