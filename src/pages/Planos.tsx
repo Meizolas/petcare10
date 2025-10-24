@@ -38,25 +38,6 @@ export default function Planos() {
       ],
     },
     {
-      icon: Zap,
-      name: 'Premium',
-      price: 'R$ 199',
-      period: '/mês',
-      description: 'Ideal para tutores que querem mais benefícios',
-      priceId: 'price_1SLEWcPSIQsRBK24SlBCzhgS',
-      color: 'from-accent to-secondary',
-      popular: true,
-      features: [
-        '2 Consultas veterinárias por mês',
-        '20% de desconto em banho e tosa',
-        'Vacinação com 25% de desconto',
-        'Check-up completo semestral grátis',
-        'Atendimento prioritário 24/7',
-        'Carteirinha digital premium',
-        'Desconto em medicamentos',
-      ],
-    },
-    {
       icon: Crown,
       name: 'VIP',
       price: 'R$ 349',
@@ -64,6 +45,7 @@ export default function Planos() {
       description: 'O melhor cuidado para o seu melhor amigo',
       priceId: 'price_1SLEWmAkAqy6bQ070Y3sTzXW',
       color: 'from-secondary to-brand-orange',
+      popular: true,
       features: [
         'Consultas veterinárias ilimitadas',
         '30% de desconto em todos os serviços',

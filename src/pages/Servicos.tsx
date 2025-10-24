@@ -53,14 +53,6 @@ export default function Servicos() {
       color: 'from-primary to-accent',
     },
     {
-      icon: Pill,
-      title: 'Vermifugação',
-      description: 'Prevenção e tratamento contra vermes e parasitas intestinais.',
-      price: 'R$ 60,00',
-      priceId: 'price_1SLEY6PSIQsRBK24EsB2JN5h',
-      color: 'from-accent to-brand-orange',
-    },
-    {
       icon: Heart,
       title: 'Check-up Completo',
       description: 'Exame geral de saúde com avaliação detalhada do seu pet.',
