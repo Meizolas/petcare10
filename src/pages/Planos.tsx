@@ -27,7 +27,7 @@ export default function Planos() {
       price: 'R$ 99',
       period: '/mês',
       description: 'Perfeito para pets que precisam de cuidados essenciais',
-      priceId: 'price_1SLEVRAkAqy6bQ07dqXjHsfm',
+      priceId: 'price_1SO4nkPSIQsRBK245qRvn6dB',
       color: 'from-primary to-primary-glow',
       features: [
         '1 Consulta veterinária por mês',
@@ -43,7 +43,7 @@ export default function Planos() {
       price: 'R$ 349',
       period: '/mês',
       description: 'O melhor cuidado para o seu melhor amigo',
-      priceId: 'price_1SLEWmAkAqy6bQ070Y3sTzXW',
+      priceId: 'price_1SO4oTPSIQsRBK24cZzSLrTR',
       color: 'from-secondary to-brand-orange',
       popular: true,
       features: [

@@ -25,7 +25,7 @@ export default function Servicos() {
       title: 'Consulta Veterinária',
       description: 'Atendimento completo com veterinários especializados para diagnóstico e tratamento.',
       price: 'R$ 150,00',
-      priceId: 'price_1SLEX2AkAqy6bQ07fyNGNODQ',
+      priceId: 'price_1SO4lGPSIQsRBK24bvLg2vDA',
       color: 'from-primary to-primary-glow',
     },
     {
@@ -33,7 +33,7 @@ export default function Servicos() {
       title: 'Vacinação',
       description: 'Vacinas essenciais para manter seu pet protegido contra doenças.',
       price: 'R$ 80,00',
-      priceId: 'price_1SLEXNAkAqy6bQ07zI0JD9CF',
+      priceId: 'price_1SO4m9PSIQsRBK24PJRoObvW',
       color: 'from-accent to-secondary',
     },
     {
@@ -41,7 +41,7 @@ export default function Servicos() {
       title: 'Banho e Tosa',
       description: 'Serviço completo de higiene e estética para seu pet ficar ainda mais bonito.',
       price: 'R$ 100,00',
-      priceId: 'price_1SLEXfAkAqy6bQ07FQrVf4Gu',
+      priceId: 'price_1SO4maPSIQsRBK24qk5C9RFU',
       color: 'from-secondary to-brand-orange',
     },
     {
@@ -49,7 +49,7 @@ export default function Servicos() {
       title: 'Banho Terapêutico',
       description: 'Tratamento especial para pets com problemas de pele ou alergias.',
       price: 'R$ 120,00',
-      priceId: 'price_1SLEXpAkAqy6bQ075YaakKua',
+      priceId: 'price_1SO4mxPSIQsRBK24Uge0WvZw',
       color: 'from-primary to-accent',
     },
     {
@@ -57,7 +57,7 @@ export default function Servicos() {
       title: 'Check-up Completo',
       description: 'Exame geral de saúde com avaliação detalhada do seu pet.',
       price: 'R$ 200,00',
-      priceId: 'price_1SLEYPAkAqy6bQ077nPto2FD',
+      priceId: 'price_1SO4nDPSIQsRBK244b3uQsrX',
       color: 'from-primary to-secondary',
     },
   ];
