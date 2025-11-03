@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
+import { ThemeToggle } from './ui/theme-toggle';
 
 export default function PetCareHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,6 +56,7 @@ export default function PetCareHeader() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1">
+            <ThemeToggle className="mr-2" />
             {navLinks.map((link) => (
               <Link
                 key={link.name}

@@ -4,6 +4,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from 'react';
 import Autoplay from "embla-carousel-autoplay";
+import { Typewriter } from "@/components/ui/typewriter";
 
 import heroGrooming from '@/assets/hero-grooming.jpg';
 import heroVet from '@/assets/hero-vet.jpg';
@@ -143,6 +144,34 @@ export default function PetCareHome() {
           </div>
         ))}
       </div>
+
+      {/* Typewriter Hero Section */}
+      <section className="relative py-20 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8">
+              <span className="text-foreground">{"Seu pet merece "}</span>
+              <Typewriter
+                text={[
+                  "amor e cuidado",
+                  "saúde e bem-estar",
+                  "carinho profissional",
+                  "atenção especial",
+                  "momentos felizes",
+                ]}
+                speed={80}
+                className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-extrabold"
+                waitTime={2000}
+                deleteSpeed={50}
+                cursorChar="|"
+              />
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8">
+              Os melhores serviços veterinários para quem você ama
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Hero Carousel Section */}
       <section className="relative py-8 bg-muted/30">
