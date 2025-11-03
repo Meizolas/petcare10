@@ -40,14 +40,23 @@ serve(async (req) => {
       );
     }
 
-    const { appointmentId } = await req.json();
+    const { appointmentId, confirmed = false, userEmail = "" } = await req.json();
 
     console.log("Processing webhook for appointment:", appointmentId, "by user:", user.id);
 
-    // Get appointment data
+    // Get appointment data with user email
     const { data: appointment, error: appointmentError } = await supabase
       .from("appointments")
-      .select("*")
+      .select(`
+        *,
+        user:user_id (
+          email,
+          profiles (
+            full_name,
+            phone
+          )
+        )
+      `)
       .eq("id", appointmentId)
       .single();
 
@@ -107,13 +116,18 @@ serve(async (req) => {
     const dataFormatada = format(brazilDate, "dd/MM/yyyy");
     const horarioFormatado = format(brazilDate, "HH:mm");
     
+    // Get email from either the userEmail parameter or from the user object
+    const email = userEmail || (appointment.user as any)?.email || "";
+    
     const webhookPayload = {
       nome_tutor: appointment.tutor_name,
       telefone: appointment.phone,
+      email: email,
       nome_pet: appointment.pet_name,
       servico: appointment.service,
       data: dataFormatada,
       horario: horarioFormatado,
+      confirmado: confirmed,
     };
 
     console.log("Sending to webhook:", config.webhook_url);

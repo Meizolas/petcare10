@@ -8,162 +8,179 @@
 
 @layer base {
   :root {
-    /* PetCare Vibrant Brand Colors */
-    --brand-lime: 85 85% 55%;
-    --brand-orange: 25 95% 53%;
-    --brand-purple: 280 90% 60%;
-    --brand-coral: 15 90% 60%;
-    
-    /* Primary Theme - Energetic Purple */
-    --primary: 280 90% 60%;
+    /* Primary Colors - Vibrant Purple/Blue */
+    --primary: 270 80% 55%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 280 90% 70%;
-    
-    /* Secondary Theme - Vibrant Lime */
-    --secondary: 85 85% 55%;
-    --secondary-foreground: 0 0% 10%;
-    
-    /* Accent - Coral */
-    --accent: 15 90% 60%;
+    --primary-glow: 270 100% 70%;
+    --primary-variant: 280 75% 45%;
+
+    /* Secondary Colors - Orange/Coral */
+    --secondary: 25 95% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Accent Colors - Lime Green */
+    --accent: 120 65% 55%;
     --accent-foreground: 0 0% 100%;
-    
-    /* Background & Surfaces */
+
+    /* Background & Surface */
     --background: 0 0% 100%;
-    --foreground: 240 10% 10%;
-    
+    --foreground: 240 10% 15%;
+
+    /* Card & Popover */
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
-    
+    --card-foreground: 240 10% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
-    
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 280 90% 60%;
-    
+    --popover-foreground: 240 10% 15%;
+
+    /* Input & Border */
+    --border: 240 10% 90%;
+    --input: 240 10% 90%;
+    --ring: 270 80% 55%;
+
+    /* Muted */
+    --muted: 240 10% 96%;
+    --muted-foreground: 240 5% 45%;
+
+    /* Destructive */
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    
-    --success: 142 76% 45%;
-    --success-foreground: 0 0% 100%;
-    
-    --radius: 1rem;
-    
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--brand-orange)));
-    --gradient-hero: linear-gradient(180deg, hsl(var(--background)), hsl(240 5% 98%));
-    
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --shadow-glow: 0 0 20px rgba(163, 77, 237, 0.3);
-    
+    --destructive-foreground: 0 0% 100%;
+
+    /* Pet Check Specific - Vibrant Colors */
+    --pet-primary: 270 80% 55%;
+    --pet-secondary: 25 95% 60%;
+    --pet-accent: 120 65% 55%;
+    --brand-orange: 25 95% 60%;
+
+    /* Gradients - More Colorful */
+    --gradient-primary: linear-gradient(135deg, hsl(270, 80%, 55%), hsl(280, 75%, 45%));
+    --gradient-secondary: linear-gradient(135deg, hsl(25, 95%, 60%), hsl(35, 90%, 55%));
+    --gradient-accent: linear-gradient(135deg, hsl(120, 65%, 55%), hsl(140, 60%, 50%));
+    --gradient-hero: linear-gradient(135deg, hsl(270, 80%, 55%) 0%, hsl(25, 95%, 60%) 50%, hsl(120, 65%, 55%) 100%);
+    --gradient-rainbow: linear-gradient(90deg, hsl(270, 80%, 55%), hsl(200, 80%, 55%), hsl(120, 65%, 55%), hsl(25, 95%, 60%));
+
+    /* Shadows - Enhanced */
+    --shadow-sm: 0 2px 4px rgba(139, 47, 140, 0.1);
+    --shadow-md: 0 4px 12px rgba(139, 47, 140, 0.15);
+    --shadow-lg: 0 10px 30px rgba(139, 47, 140, 0.2);
+    --shadow-glow: 0 0 30px rgba(139, 47, 140, 0.3);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 10% 15%;
+    --sidebar-primary: 270 80% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 10% 96%;
+    --sidebar-accent-foreground: 240 10% 15%;
+    --sidebar-border: 240 10% 90%;
+    --sidebar-ring: 270 80% 55%;
+
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 280 90% 60%;
+    --radius: 1rem;
   }
 
-  .dark {
-    --background: 240 10% 8%;
-    --foreground: 0 0% 98%;
-    
-    --card: 240 10% 12%;
-    --card-foreground: 0 0% 98%;
-    
-    --popover: 240 10% 12%;
-    --popover-foreground: 0 0% 98%;
-    
-    --primary: 280 90% 60%;
-    --primary-foreground: 0 0% 100%;
-    
-    --secondary: 85 85% 55%;
-    --secondary-foreground: 0 0% 10%;
-    
-    --muted: 240 10% 15%;
-    --muted-foreground: 240 5% 65%;
-    
-    --accent: 15 90% 60%;
-    --accent-foreground: 0 0% 100%;
-    
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 98%;
-    
-    --border: 240 10% 20%;
-    --input: 240 10% 20%;
-    --ring: 280 90% 60%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 280 90% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 280 90% 60%;
-  }
+.dark {
+  --background: 240 10% 8%;
+  --foreground: 0 0% 95%;
+
+  --card: 240 10% 12%;
+  --card-foreground: 0 0% 95%;
+
+  --popover: 240 10% 12%;
+  --popover-foreground: 0 0% 95%;
+
+  --primary: 270 80% 60%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 270 100% 75%;
+
+  --secondary: 25 95% 65%;
+  --secondary-foreground: 0 0% 100%;
+
+  --accent: 120 65% 60%;
+  --accent-foreground: 0 0% 100%;
+
+  --muted: 240 10% 15%;
+  --muted-foreground: 240 5% 60%;
+
+  --border: 240 10% 20%;
+  --input: 240 10% 20%;
+  --ring: 270 80% 60%;
+
+  --destructive: 0 84% 65%;
+  --destructive-foreground: 0 0% 100%;
+
+  --sidebar-background: 240 10% 10%;
+  --sidebar-foreground: 0 0% 95%;
+  --sidebar-primary: 270 80% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 10% 15%;
+  --sidebar-accent-foreground: 0 0% 95%;
+  --sidebar-border: 240 10% 20%;
+  --sidebar-ring: 270 80% 60%;
 }
 
-@layer base {
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: 'Poppins', sans-serif;
+    @apply bg-background text-foreground font-[Poppins];
+  }
+
+  /* Custom Scrollbar - Purple Animated */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, hsl(270, 80%, 55%), hsl(280, 75%, 45%));
+    border-radius: 6px;
+    border: 2px solid hsl(var(--muted));
+    transition: all 0.3s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, hsl(270, 90%, 65%), hsl(280, 85%, 55%));
+    box-shadow: 0 0 10px hsl(270, 80%, 55%);
+  }
+
+  /* Firefox Scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(270, 80%, 55%) hsl(var(--muted));
   }
 }
 
 @layer components {
-  /* PetCare Custom Components */
   .pet-card {
-    @apply bg-card rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-border/50;
+    @apply bg-card text-card-foreground rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-border hover:border-primary/50 hover:scale-[1.02];
   }
-  
+
   .pet-button {
-    @apply bg-primary text-primary-foreground px-8 py-3 rounded-full font-semibold 
-           hover:bg-primary/90 transition-all duration-300 hover:scale-105 hover:shadow-lg
-           active:scale-95;
+    @apply bg-gradient-to-r from-primary via-primary to-accent hover:brightness-110 text-primary-foreground font-semibold py-3 px-6 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/50 hover:scale-105;
   }
-  
-  .pet-button-secondary {
-    @apply bg-secondary text-secondary-foreground px-8 py-3 rounded-full font-semibold 
-           hover:bg-secondary/90 transition-all duration-300 hover:scale-105 hover:shadow-lg
-           active:scale-95;
-  }
-  
-  .pet-button-outline {
-    @apply border-2 border-primary text-primary px-8 py-3 rounded-full font-semibold 
-           hover:bg-primary hover:text-primary-foreground transition-all duration-300 
-           hover:scale-105 hover:shadow-lg active:scale-95;
-  }
-  
+
   .pet-input {
-    @apply w-full px-4 py-3 border-2 border-input rounded-xl bg-background
-           focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent 
-           transition-all duration-200 placeholder:text-muted-foreground;
+    @apply w-full px-4 py-3 bg-background border-2 border-input rounded-lg focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all;
   }
-  
+
   .section-title {
-    @apply text-4xl md:text-5xl font-bold mb-4 text-foreground;
+    @apply text-3xl md:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
   }
-  
+
   .promo-badge {
-    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-white font-bold text-lg shadow-lg;
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-white font-bold text-sm shadow-lg animate-pulse-slow;
+  }
+
+  .icon-float {
+    @apply hover:scale-110 transition-all duration-300 hover:rotate-12;
   }
   
   /* Particle animation */
