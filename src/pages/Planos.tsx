@@ -1,6 +1,11 @@
-import { Check, Crown, Zap, Shield } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
+"use client"
+
+import { Check, Crown, Zap, Shield, Star } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
+import NumberFlow from '@number-flow/react';
+import confetti from 'canvas-confetti';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -9,23 +14,25 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function Planos() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isYearly, setIsYearly] = useState(false);
   const { toast } = useToast();
+  const switchRef = useRef<HTMLButtonElement>(null);
 
   const plans = [
     {
       icon: Shield,
       name: 'Básico',
-      price: 'R$ 99',
-      period: '/mês',
+      monthlyPrice: 99,
+      yearlyPrice: 950,
+      period: 'mês',
       description: 'Perfeito para pets que precisam de cuidados essenciais',
       priceId: 'price_1SO4nkPSIQsRBK245qRvn6dB',
       color: 'from-primary to-primary-glow',
@@ -38,13 +45,32 @@ export default function Planos() {
       ],
     },
     {
-      icon: Crown,
-      name: 'VIP',
-      price: 'R$ 349',
-      period: '/mês',
-      description: 'O melhor cuidado para o seu melhor amigo',
+      icon: Zap,
+      name: 'Intermediário',
+      monthlyPrice: 199,
+      yearlyPrice: 1910,
+      period: 'mês',
+      description: 'Cuidado completo com ótimo custo-benefício',
       priceId: 'price_1SO4oTPSIQsRBK24cZzSLrTR',
       color: 'from-secondary to-brand-orange',
+      features: [
+        '3 Consultas veterinárias por mês',
+        '20% de desconto em todos os serviços',
+        'Vacinação com 30% de desconto',
+        'Check-up semestral grátis',
+        'Atendimento preferencial',
+        '1 Banho e tosa mensal incluso',
+      ],
+    },
+    {
+      icon: Crown,
+      name: 'VIP',
+      monthlyPrice: 349,
+      yearlyPrice: 3350,
+      period: 'mês',
+      description: 'O melhor cuidado para o seu melhor amigo',
+      priceId: 'price_1SO4oTPSIQsRBK24cZzSLrTR',
+      color: 'from-accent to-primary',
       popular: true,
       features: [
         'Consultas veterinárias ilimitadas',
@@ -61,7 +87,35 @@ export default function Planos() {
 
   const handleSelectPlan = (plan: any) => {
     setSelectedPlan(plan);
-    setPaymentMethod('');
+  };
+
+  const handleToggle = (checked: boolean) => {
+    setIsYearly(checked);
+    if (checked && switchRef.current) {
+      const rect = switchRef.current.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: {
+          x: x / window.innerWidth,
+          y: y / window.innerHeight,
+        },
+        colors: [
+          'hsl(var(--primary))',
+          'hsl(var(--accent))',
+          'hsl(var(--secondary))',
+          'hsl(var(--muted))',
+        ],
+        ticks: 200,
+        gravity: 1.2,
+        decay: 0.94,
+        startVelocity: 30,
+        shapes: ['circle'],
+      });
+    }
   };
 
   const handlePayment = async () => {
@@ -89,12 +143,11 @@ export default function Planos() {
       if (error) throw error;
 
       if (data?.url) {
-        // Redirect to Stripe Checkout
         window.location.href = data.url;
       } else {
         throw new Error('URL de checkout não retornada');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao processar pagamento:', error);
       toast({
         title: 'Erro ao processar pagamento',
@@ -109,64 +162,131 @@ export default function Planos() {
     <div className="min-h-screen py-20">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="section-title">Planos PetCare</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4">
-            Escolha o plano ideal para garantir o melhor cuidado contínuo para seu pet
+        <div className="text-center mb-12 space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              Planos PetCare
+            </span>
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Escolha o plano que funciona para você
           </p>
+        </div>
+
+        {/* Toggle Switch */}
+        <div className="flex justify-center mb-10">
+          <label className="relative inline-flex items-center cursor-pointer gap-3">
+            <span className="font-semibold">Mensal</span>
+            <Label>
+              <Switch
+                ref={switchRef as any}
+                checked={isYearly}
+                onCheckedChange={handleToggle}
+                className="relative"
+              />
+            </Label>
+            <span className="font-semibold">
+              Anual <span className="text-primary">(Economize 20%)</span>
+            </span>
+          </label>
         </div>
 
         {/* Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {plans.map((plan, index) => (
-            <div
+            <motion.div
               key={index}
-              className={`pet-card relative ${
-                plan.popular ? 'ring-2 ring-primary shadow-2xl scale-105' : ''
-              }`}
-              style={{ animationDelay: `${index * 100}ms` }}
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ 
+                y: plan.popular ? -20 : 0, 
+                opacity: 1,
+                scale: plan.popular ? 1 : 0.94,
+              }}
+              transition={{
+                duration: 0.6,
+                type: 'spring',
+                stiffness: 100,
+                damping: 30,
+                delay: index * 0.1,
+              }}
+              className={cn(
+                `rounded-2xl border-[1px] p-6 bg-background text-center flex flex-col relative`,
+                plan.popular ? 'border-primary border-2 shadow-2xl' : 'border-border',
+              )}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
-                  Mais Popular
+                <div className="absolute top-0 right-0 bg-primary py-0.5 px-2 rounded-bl-xl rounded-tr-xl flex items-center">
+                  <Star className="text-primary-foreground h-4 w-4 fill-current" />
+                  <span className="text-primary-foreground ml-1 font-sans font-semibold">
+                    Popular
+                  </span>
                 </div>
               )}
+              
+              <div className="flex-1 flex flex-col">
+                <div className={`service-icon bg-gradient-to-br ${plan.color} mx-auto mb-4`}>
+                  <plan.icon className="h-8 w-8" />
+                </div>
 
-              <div className={`service-icon bg-gradient-to-br ${plan.color} mx-auto`}>
-                <plan.icon className="h-8 w-8" />
+                <p className="text-base font-semibold text-muted-foreground mb-4">
+                  {plan.name}
+                </p>
+
+                <div className="flex items-center justify-center gap-x-2 mb-2">
+                  <span className="text-5xl font-bold tracking-tight text-foreground">
+                    <NumberFlow
+                      value={isYearly ? plan.yearlyPrice / 12 : plan.monthlyPrice}
+                      format={{
+                        style: 'currency',
+                        currency: 'BRL',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      }}
+                      transformTiming={{
+                        duration: 500,
+                        easing: 'ease-out',
+                      }}
+                      willChange
+                    />
+                  </span>
+                  <span className="text-sm font-semibold leading-6 tracking-wide text-muted-foreground">
+                    / {plan.period}
+                  </span>
+                </div>
+
+                <p className="text-xs leading-5 text-muted-foreground mb-6">
+                  {isYearly ? 'cobrado anualmente' : 'cobrado mensalmente'}
+                </p>
+
+                <p className="text-sm text-muted-foreground mb-6">
+                  {plan.description}
+                </p>
+
+                <ul className="space-y-3 mb-6 text-left">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <hr className="w-full my-4" />
+
+                <Button
+                  onClick={() => handleSelectPlan(plan)}
+                  className={cn(
+                    "w-full gap-2 overflow-hidden text-lg font-semibold tracking-tighter",
+                    "transform-gpu ring-offset-current transition-all duration-300 ease-out hover:ring-2 hover:ring-primary hover:ring-offset-1",
+                    plan.popular
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-muted text-foreground hover:bg-muted/80"
+                  )}
+                >
+                  Escolher Plano
+                </Button>
               </div>
-
-              <h3 className="text-2xl font-bold mb-2 text-center">{plan.name}</h3>
-
-              <div className="text-center mb-4">
-                <span className="text-4xl font-bold text-primary">{plan.price}</span>
-                <span className="text-muted-foreground">{plan.period}</span>
-              </div>
-
-              <p className="text-muted-foreground text-center mb-6">
-                {plan.description}
-              </p>
-
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                onClick={() => handleSelectPlan(plan)}
-                className={`w-full ${
-                  plan.popular
-                    ? 'bg-gradient-to-r from-primary to-accent hover:opacity-90'
-                    : ''
-                }`}
-              >
-                Escolher Plano
-              </Button>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -203,7 +323,7 @@ export default function Planos() {
           <DialogHeader>
             <DialogTitle>Finalizar Assinatura</DialogTitle>
             <DialogDescription>
-              Plano {selectedPlan?.name} - {selectedPlan?.price}/mês
+              Plano {selectedPlan?.name} - R$ {isYearly ? selectedPlan?.yearlyPrice : selectedPlan?.monthlyPrice}/{isYearly ? 'ano' : 'mês'}
             </DialogDescription>
           </DialogHeader>
 

@@ -188,8 +188,10 @@ export default function Agendar() {
     <div className="min-h-screen py-20 gradient-hero">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="section-title">Agendar Consulta</h1>
-          <p className="text-lg text-muted-foreground mt-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary-variant bg-clip-text text-transparent">
+            Agendar Consulta
+          </h1>
+          <p className="text-lg text-foreground mt-4 font-medium">
             Preencha os dados abaixo para agendar o atendimento do seu pet
           </p>
         </div>

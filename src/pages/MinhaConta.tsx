@@ -10,10 +10,10 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, Clock, Upload, User } from 'lucide-react';
+import { Calendar, Clock, Upload, User, LogOut } from 'lucide-react';
 
 export default function MinhaConta() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -91,7 +91,18 @@ export default function MinhaConta() {
   return (
     <div className="min-h-screen py-20 gradient-hero">
       <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="section-title mb-12">Minha Conta</h1>
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="section-title">Minha Conta</h1>
+          <Button
+            onClick={signOut}
+            variant="outline"
+            size="sm"
+            className="rounded-full"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sair
+          </Button>
+        </div>
 
         <div className="grid gap-8">
           <Card>

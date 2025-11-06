@@ -248,4 +248,17 @@
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-15px); }
   }
+  
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  
+  .animate-marquee {
+    animation: marquee var(--duration) linear infinite;
+  }
 }

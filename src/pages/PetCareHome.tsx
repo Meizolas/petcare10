@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useEffect, useState } from 'react';
 import Autoplay from "embla-carousel-autoplay";
 import { Typewriter } from "@/components/ui/typewriter";
+import { TestimonialsSection } from "@/components/TestimonialsSection";
 
 import heroGrooming from '@/assets/hero-grooming.jpg';
 import heroVet from '@/assets/hero-vet.jpg';
@@ -153,17 +154,17 @@ export default function PetCareHome() {
               <span className="text-foreground">{"Seu pet merece "}</span>
               <Typewriter
                 text={[
-                  "amor e cuidado",
-                  "saúde e bem-estar",
-                  "carinho profissional",
-                  "atenção especial",
-                  "momentos felizes",
+                  "amor",
+                  "carinho",
+                  "atenção",
+                  "saúde",
+                  "Pet Care",
                 ]}
-                speed={80}
+                speed={70}
                 className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-extrabold"
-                waitTime={2000}
-                deleteSpeed={50}
-                cursorChar="|"
+                waitTime={1500}
+                deleteSpeed={40}
+                cursorChar="_"
               />
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8">
@@ -342,46 +343,52 @@ export default function PetCareHome() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="section-title">O Que Dizem Nossos Clientes</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                name: 'Maria Silva',
-                pet: 'Tutora do Rex',
-                text: 'Melhor clínica veterinária da região! O atendimento é impecável e meu cachorro adora ir lá.',
-              },
-              {
-                name: 'João Santos',
-                pet: 'Tutor da Mia',
-                text: 'Profissionais super atenciosos e carinhosos. Recomendo de olhos fechados!',
-              },
-              {
-                name: 'Ana Costa',
-                pet: 'Tutora do Bob',
-                text: 'Sistema de agendamento super prático. Nunca mais perdi tempo em filas!',
-              },
-            ].map((depoimento, index) => (
-              <Card key={index} className="p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
-                    {depoimento.name.charAt(0)}
-                  </div>
-                  <div className="ml-4">
-                    <h4 className="font-semibold text-foreground">{depoimento.name}</h4>
-                    <p className="text-sm text-muted-foreground">{depoimento.pet}</p>
-                  </div>
-                </div>
-                <p className="text-muted-foreground italic">"{depoimento.text}"</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimonialsSection
+        title="O Que Dizem Nossos Clientes"
+        description="Histórias reais de tutores satisfeitos"
+        testimonials={[
+          {
+            author: {
+              name: 'Maria Silva',
+              title: 'Tutora de Rex',
+              avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop'
+            },
+            text: 'Meu cachorro adora vir aqui! O atendimento é excelente e profissional. A equipe realmente se importa com o bem-estar dos pets.'
+          },
+          {
+            author: {
+              name: 'João Santos',
+              title: 'Tutor de Mimi',
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop'
+            },
+            text: 'Desde que trouxe minha gata aqui, ela está muito mais saudável e feliz. Os veterinários são muito dedicados!'
+          },
+          {
+            author: {
+              name: 'Ana Costa',
+              title: 'Tutora de Thor',
+              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop'
+            },
+            text: 'Recomendo a todos! Cuidado excepcional e muita atenção aos detalhes. Meu pet sempre volta feliz e cheiroso.'
+          },
+          {
+            author: {
+              name: 'Pedro Lima',
+              title: 'Tutor de Luna',
+              avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop'
+            },
+            text: 'Profissionais extremamente competentes e carinhosos. Confio totalmente no trabalho deles com minha cachorrinha.'
+          },
+          {
+            author: {
+              name: 'Carla Mendes',
+              title: 'Tutora de Bob',
+              avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop'
+            },
+            text: 'Sempre encontro horários flexíveis e o preço é justo. Meu gato fica tranquilo durante os atendimentos.'
+          }
+        ]}
+      />
     </div>
   );
 }

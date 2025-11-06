@@ -56,7 +56,6 @@ export default function PetCareHeader() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1">
-            <ThemeToggle className="mr-2" />
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -96,15 +95,7 @@ export default function PetCareHeader() {
                     Admin
                   </Link>
                 )}
-                <Button
-                  onClick={signOut}
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sair
-                </Button>
+                <ThemeToggle className="ml-2" />
               </>
             ) : (
               <Link
@@ -126,6 +117,9 @@ export default function PetCareHeader() {
 
         {isMenuOpen && (
           <div className="md:hidden py-4 space-y-2 animate-in slide-in-from-top-2">
+            <div className="flex justify-center mb-4">
+              <ThemeToggle />
+            </div>
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -167,16 +161,6 @@ export default function PetCareHeader() {
                     Admin
                   </Link>
                 )}
-                <button
-                  onClick={() => {
-                    signOut();
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-all"
-                >
-                  <LogOut className="h-4 w-4 inline mr-2" />
-                  Sair
-                </button>
               </>
             ) : (
               <Link
