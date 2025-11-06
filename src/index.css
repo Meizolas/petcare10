@@ -257,8 +257,21 @@
       transform: translateX(calc(-100% - var(--gap)));
     }
   }
+
+  @keyframes marquee-infinite {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
   
   .animate-marquee {
     animation: marquee var(--duration) linear infinite;
+  }
+
+  .animate-marquee-infinite {
+    animation: marquee-infinite var(--duration) linear infinite;
   }
 }

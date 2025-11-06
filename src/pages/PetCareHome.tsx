@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Heart, Sparkles, Shield, Clock, Stethoscope, Scissors, Syringe, PawPrint, BadgePercent, Gift, Tag, ArrowRight } from 'lucide-react';
+import { Heart, Sparkles, Shield, Clock, Stethoscope, Scissors, Syringe, PawPrint, BadgePercent, Gift, Tag, ArrowRight, Home } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from 'react';
@@ -84,6 +84,12 @@ export default function PetCareHome() {
       title: 'Adestramento',
       description: 'Educação e comportamento.',
       color: 'bg-[#82C45C]',
+    },
+    {
+      icon: Home,
+      title: 'Hospedagem Pet',
+      description: 'Acomodação segura e confortável.',
+      color: 'bg-[#FF1493]',
     },
   ];
 
@@ -240,6 +246,30 @@ export default function PetCareHome() {
         </div>
       </section>
 
+      {/* About Section */}
+      <section className="py-20 bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <h2 className="section-title">Sobre o PetCare</h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              O PetCare nasceu do amor e dedicação aos animais. Nossa missão é proporcionar 
+              o melhor cuidado veterinário para seu pet, com serviços completos que garantem 
+              saúde, bem-estar e felicidade.
+            </p>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Com uma equipe de veterinários altamente qualificados, equipamentos modernos 
+              e um ambiente acolhedor, oferecemos desde consultas de rotina até emergências 
+              24 horas. Nosso compromisso é tratar cada pet como parte da nossa família.
+            </p>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Mais do que uma clínica veterinária, somos parceiros na jornada de cuidar de 
+              quem você ama. Porque seu pet merece o melhor, e nós estamos aqui para 
+              proporcionar isso todos os dias.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Services Section - Cuidados Essenciais */}
       <section className="py-20">
         <div className="container mx-auto px-4">
@@ -250,7 +280,7 @@ export default function PetCareHome() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {services.map((service, index) => (
               <Link key={index} to="/servicos">
                 <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border-0">
