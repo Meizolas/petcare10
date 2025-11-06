@@ -1,3 +1,4 @@
+// TestimonialsSection component - animated testimonials carousel
 import { cn } from "@/lib/utils"
 import { TestimonialCard, TestimonialAuthor } from "@/components/ui/testimonial-card"
 

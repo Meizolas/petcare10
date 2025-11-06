@@ -14,6 +14,8 @@ import heroBath from '@/assets/hero-bath.jpg';
 
 export default function PetCareHome() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  // Component state management
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
