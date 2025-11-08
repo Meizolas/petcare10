@@ -185,13 +185,13 @@ export default function Agendar() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen py-20 gradient-hero">
+    <div className="min-h-screen py-20 bg-background">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary-variant bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground">
             Agendar Consulta
           </h1>
-          <p className="text-lg text-foreground mt-4 font-medium">
+          <p className="text-lg text-muted-foreground mt-4">
             Preencha os dados abaixo para agendar o atendimento do seu pet
           </p>
         </div>

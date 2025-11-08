@@ -89,7 +89,7 @@ export default function MinhaConta() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen py-20 gradient-hero">
+    <div className="min-h-screen py-20 bg-background">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="flex justify-between items-center mb-12">
           <h1 className="section-title">Minha Conta</h1>
