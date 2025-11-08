@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, CheckCircle, Clock, Phone, User, PawPrint, Mail, Loader2 } from "lucide-react";
+import { Calendar, CheckCircle, Clock, Phone, User, PawPrint, Loader2, Tag, ShoppingBag } from "lucide-react";
 
 interface Appointment {
   id: string;
@@ -169,20 +169,34 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted/30 via-background to-muted/30">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 max-w-7xl">
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 bg-primary/10 rounded-xl icon-float">
-              <PawPrint className="h-8 w-8 text-primary" />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-              Painel Administrativo
-            </h1>
+          <h1 className="text-4xl font-bold text-foreground mb-4">
+            Painel Administrativo
+          </h1>
+          
+          {/* Admin Navigation */}
+          <div className="flex gap-4 mb-8">
+            <Link to="/admin">
+              <Button variant="default">
+                <Calendar className="h-4 w-4 mr-2" />
+                Agendamentos
+              </Button>
+            </Link>
+            <Link to="/admin/cupons">
+              <Button variant="outline">
+                <Tag className="h-4 w-4 mr-2" />
+                Cupons
+              </Button>
+            </Link>
+            <Link to="/admin/pedidos">
+              <Button variant="outline">
+                <ShoppingBag className="h-4 w-4 mr-2" />
+                Pedidos
+              </Button>
+            </Link>
           </div>
-          <p className="text-muted-foreground text-lg ml-16">
-            Gerencie todos os agendamentos de forma profissional
-          </p>
         </div>
 
         {loading ? (

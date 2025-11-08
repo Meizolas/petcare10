@@ -14,6 +14,10 @@ import Contato from "./pages/Contato";
 import Auth from "./pages/Auth";
 import MinhaConta from "./pages/MinhaConta";
 import Admin from "./pages/Admin";
+import AdminCoupons from "./pages/AdminCoupons";
+import AdminOrders from "./pages/AdminOrders";
+import Medicamentos from "./pages/Medicamentos";
+import Carrinho from "./pages/Carrinho";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 
@@ -33,11 +37,15 @@ const App = () => (
                 <Route path="/" element={<PetCareHome />} />
                 <Route path="/servicos" element={<Servicos />} />
                 <Route path="/planos" element={<Planos />} />
+                <Route path="/medicamentos" element={<Medicamentos />} />
+                <Route path="/carrinho" element={<Carrinho />} />
                 <Route path="/agendar" element={<Agendar />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/minha-conta" element={<MinhaConta />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/cupons" element={<AdminCoupons />} />
+                <Route path="/admin/pedidos" element={<AdminOrders />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

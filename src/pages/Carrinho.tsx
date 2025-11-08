@@ -219,21 +219,35 @@ export default function Carrinho() {
 
       // Update coupon usage
       if (appliedCoupon) {
-        await supabase.rpc('increment', {
-          table_name: 'coupons',
-          row_id: appliedCoupon.id,
-          column_name: 'current_uses',
-        });
-
+        // Increment coupon usage
         await supabase
+          .from('coupons')
+          .update({ current_uses: appliedCoupon.current_uses + 1 })
+          .eq('id', appliedCoupon.id);
+
+        // Track user-specific usage
+        const { data: existingUsage } = await supabase
           .from('coupon_usage')
-          .upsert({
-            coupon_id: appliedCoupon.id,
-            user_id: user!.id,
-            usage_count: 1,
-          }, {
-            onConflict: 'coupon_id,user_id',
-          });
+          .select('usage_count')
+          .eq('coupon_id', appliedCoupon.id)
+          .eq('user_id', user!.id)
+          .maybeSingle();
+
+        if (existingUsage) {
+          await supabase
+            .from('coupon_usage')
+            .update({ usage_count: existingUsage.usage_count + 1 })
+            .eq('coupon_id', appliedCoupon.id)
+            .eq('user_id', user!.id);
+        } else {
+          await supabase
+            .from('coupon_usage')
+            .insert({
+              coupon_id: appliedCoupon.id,
+              user_id: user!.id,
+              usage_count: 1,
+            });
+        }
       }
 
       // Clear cart

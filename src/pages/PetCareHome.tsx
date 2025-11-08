@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Heart, Sparkles, Shield, Clock, Stethoscope, Scissors, Syringe, PawPrint, BadgePercent, Gift, Tag, ArrowRight, Home } from 'lucide-react';
+import { Heart, Sparkles, Shield, Clock, Stethoscope, Scissors, Syringe, PawPrint, BadgePercent, Gift, Tag, ArrowRight, Home, CheckCircle } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from 'react';
 import Autoplay from "embla-carousel-autoplay";
 import { Typewriter } from "@/components/ui/typewriter";
@@ -44,11 +44,11 @@ export default function PetCareHome() {
     },
     {
       image: heroDaycare,
-      title: 'Creche para Pets',
-      subtitle: 'Diversão e segurança garantidas',
+      title: 'Medicamentos',
+      subtitle: 'Produtos para saúde do seu pet',
       badge: 'NOVO',
       badgeColor: 'bg-primary',
-      link: '/servicos'
+      link: '/medicamentos'
     },
     {
       image: heroBath,
@@ -247,25 +247,93 @@ export default function PetCareHome() {
       </section>
 
       {/* About Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10">
+      <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
-            <h2 className="section-title">Sobre o PetCare</h2>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              O PetCare nasceu do amor e dedicação aos animais. Nossa missão é proporcionar 
-              o melhor cuidado veterinário para seu pet, com serviços completos que garantem 
-              saúde, bem-estar e felicidade.
-            </p>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Com uma equipe de veterinários altamente qualificados, equipamentos modernos 
-              e um ambiente acolhedor, oferecemos desde consultas de rotina até emergências 
-              24 horas. Nosso compromisso é tratar cada pet como parte da nossa família.
-            </p>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Mais do que uma clínica veterinária, somos parceiros na jornada de cuidar de 
-              quem você ama. Porque seu pet merece o melhor, e nós estamos aqui para 
-              proporcionar isso todos os dias.
-            </p>
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-12">
+              Sobre o PetCare
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Heart className="h-8 w-8 text-primary" />
+                    <CardTitle className="text-2xl">Nossa Missão</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground leading-relaxed">
+                    O PetCare nasceu do amor e dedicação aos animais. Nossa missão é proporcionar 
+                    o melhor cuidado veterinário para seu pet, com serviços completos que garantem 
+                    saúde, bem-estar e felicidade. Porque seu pet merece o melhor, e nós estamos 
+                    aqui para proporcionar isso todos os dias.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Shield className="h-8 w-8 text-primary" />
+                    <CardTitle className="text-2xl">Nossa Equipe</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Com uma equipe de veterinários altamente qualificados, equipamentos modernos 
+                    e um ambiente acolhedor, oferecemos desde consultas de rotina até emergências 
+                    24 horas. Nosso compromisso é tratar cada pet como parte da nossa família.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Sparkles className="h-8 w-8 text-primary" />
+                    <CardTitle className="text-2xl">Diferenciais</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-primary" />
+                      Atendimento 24 horas para emergências
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-primary" />
+                      Equipamentos de última geração
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-primary" />
+                      Profissionais especializados e certificados
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-primary" />
+                      Farmácia com medicamentos para seu pet
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <PawPrint className="h-8 w-8 text-primary" />
+                    <CardTitle className="text-2xl">Nosso Objetivo</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Mais do que uma clínica veterinária, somos parceiros na jornada de cuidar de 
+                    quem você ama. Oferecemos planos de saúde acessíveis, medicamentos de qualidade, 
+                    serviços de hospedagem e adestramento. Tudo pensado para facilitar a vida de 
+                    tutores responsáveis.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>

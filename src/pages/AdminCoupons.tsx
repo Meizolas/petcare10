@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Tag } from 'lucide-react';
+import { Plus, Trash2, Tag, Calendar, ShoppingBag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 
@@ -170,8 +170,32 @@ export default function AdminCoupons() {
   return (
     <div className="min-h-screen py-20 bg-background">
       <div className="container mx-auto px-4 max-w-6xl">
+        <h1 className="text-4xl font-bold mb-4">Painel Administrativo</h1>
+        
+        {/* Admin Navigation */}
+        <div className="flex gap-4 mb-8">
+          <Link to="/admin">
+            <Button variant="outline">
+              <Calendar className="h-4 w-4 mr-2" />
+              Agendamentos
+            </Button>
+          </Link>
+          <Link to="/admin/cupons">
+            <Button variant="default">
+              <Tag className="h-4 w-4 mr-2" />
+              Cupons
+            </Button>
+          </Link>
+          <Link to="/admin/pedidos">
+            <Button variant="outline">
+              <ShoppingBag className="h-4 w-4 mr-2" />
+              Pedidos
+            </Button>
+          </Link>
+        </div>
+
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Gerenciar Cupons</h1>
+          <h2 className="text-2xl font-bold">Gerenciar Cupons</h2>
           <Button onClick={() => setShowForm(!showForm)}>
             <Plus className="h-4 w-4 mr-2" />
             Novo Cupom

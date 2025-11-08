@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Package, User, Calendar, DollarSign } from 'lucide-react';
+import { Package, User, Calendar as CalendarIcon, DollarSign, Tag, ShoppingBag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -18,10 +19,9 @@ interface Order {
   coupon_code: string | null;
   status: string;
   created_at: string;
-  profiles: {
-    full_name: string;
-    phone: string;
-  };
+  user_email: string;
+  user_full_name: string;
+  user_phone: string;
 }
 
 interface OrderItem {
@@ -56,16 +56,30 @@ export default function AdminOrders() {
 
   const loadOrders = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: ordersData, error } = await supabase
         .from('orders')
-        .select(`
-          *,
-          profiles(full_name, phone)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setOrders(data || []);
+      
+      // Fetch user profiles separately
+      const userIds = [...new Set(ordersData?.map(o => o.user_id) || [])];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, full_name, phone')
+        .in('id', userIds);
+      
+      const profileMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+      
+      const ordersWithProfiles: Order[] = (ordersData || []).map(order => ({
+        ...order,
+        user_email: '', // Email will be shown in full profile if needed
+        user_full_name: profileMap.get(order.user_id)?.full_name || 'N/A',
+        user_phone: profileMap.get(order.user_id)?.phone || '',
+      }));
+
+      setOrders(ordersWithProfiles);
     } catch (error: any) {
       toast({
         title: 'Erro',
@@ -119,7 +133,31 @@ export default function AdminOrders() {
   return (
     <div className="min-h-screen py-20 bg-background">
       <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-4xl font-bold mb-8">Logs de Pedidos</h1>
+        <h1 className="text-4xl font-bold mb-4">Painel Administrativo</h1>
+        
+        {/* Admin Navigation */}
+        <div className="flex gap-4 mb-8">
+          <Link to="/admin">
+            <Button variant="outline">
+              <CalendarIcon className="h-4 w-4 mr-2" />
+              Agendamentos
+            </Button>
+          </Link>
+          <Link to="/admin/cupons">
+            <Button variant="outline">
+              <Tag className="h-4 w-4 mr-2" />
+              Cupons
+            </Button>
+          </Link>
+          <Link to="/admin/pedidos">
+            <Button variant="default">
+              <ShoppingBag className="h-4 w-4 mr-2" />
+              Pedidos
+            </Button>
+          </Link>
+        </div>
+
+        <h2 className="text-2xl font-bold mb-8">Logs de Pedidos</h2>
 
         <div className="grid gap-4">
           {orders.map((order) => (
@@ -134,13 +172,13 @@ export default function AdminOrders() {
                     <User className="h-5 w-5 text-primary mt-1" />
                     <div>
                       <p className="text-sm text-muted-foreground">Cliente</p>
-                      <p className="font-semibold">{order.profiles?.full_name}</p>
-                      <p className="text-sm text-muted-foreground">{order.profiles?.phone}</p>
+                      <p className="font-semibold">{order.user_full_name}</p>
+                      <p className="text-sm text-muted-foreground">{order.user_phone}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Calendar className="h-5 w-5 text-primary mt-1" />
+                    <CalendarIcon className="h-5 w-5 text-primary mt-1" />
                     <div>
                       <p className="text-sm text-muted-foreground">Data</p>
                       <p className="font-semibold">

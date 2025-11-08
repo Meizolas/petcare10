@@ -36,6 +36,7 @@ export default function PetCareHeader() {
     { name: 'Início', href: '/' },
     { name: 'Serviços', href: '/servicos' },
     { name: 'Planos', href: '/planos' },
+    { name: 'Medicamentos', href: '/medicamentos' },
     { name: 'Agendar', href: '/agendar' },
     { name: 'Contato', href: '/contato' },
   ];
