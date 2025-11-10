@@ -5,8 +5,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { ShoppingCart, Plus, Minus, Package } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Package, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import glicopanImg from '@/assets/glicopan.webp';
+import tossPetImg from '@/assets/toss-pet.webp';
+import meticortenImg from '@/assets/meticorten.jpg';
+import simparicImg from '@/assets/simparic.jpg';
+import revolutionImg from '@/assets/revolution.webp';
+import chemitalImg from '@/assets/chemital.webp';
 
 interface Product {
   id: string;
@@ -30,6 +37,16 @@ export default function Medicamentos() {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>('todos');
+
+  const productImages: Record<string, string> = {
+    'Glicopan Pet': glicopanImg,
+    'Toss-Pet Xarope': tossPetImg,
+    'Meticorten 5mg': meticortenImg,
+    'Simparic 20mg': simparicImg,
+    'Revolution 6% Gatos': revolutionImg,
+    'Chemital Gatos 4kg': chemitalImg,
+  };
 
   useEffect(() => {
     loadProducts();
@@ -130,11 +147,16 @@ export default function Medicamentos() {
       medicamentos: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
       suplementos: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
       higiene: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      antiparasitarios: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
     };
     return colors[category] || 'bg-gray-100 text-gray-800';
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const filteredProducts = selectedCategory === 'todos' 
+    ? products 
+    : products.filter(p => p.category === selectedCategory);
 
   if (loading) {
     return (
@@ -147,7 +169,7 @@ export default function Medicamentos() {
   return (
     <div className="min-h-screen py-20 bg-background">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               Medicamentos Pet
@@ -156,31 +178,52 @@ export default function Medicamentos() {
               Encontre os melhores produtos para a saúde do seu pet
             </p>
           </div>
-          
-          {user && (
-            <Button
-              onClick={() => navigate('/carrinho')}
-              size="lg"
-              className="relative"
-            >
-              <ShoppingCart className="h-5 w-5 mr-2" />
-              Carrinho
-              {totalItems > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center">
-                  {totalItems}
-                </Badge>
-              )}
-            </Button>
-          )}
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full sm:w-auto">
+              <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full">
+                <TabsTrigger value="todos">Todos</TabsTrigger>
+                <TabsTrigger value="medicamentos">Medicamentos</TabsTrigger>
+                <TabsTrigger value="suplementos">Suplementos</TabsTrigger>
+                <TabsTrigger value="higiene">Higiene</TabsTrigger>
+                <TabsTrigger value="antiparasitarios">Anti-parasitas</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            {user && (
+              <Button
+                onClick={() => navigate('/carrinho')}
+                size="lg"
+                className="relative w-full sm:w-auto"
+              >
+                <ShoppingCart className="h-5 w-5 mr-2" />
+                Carrinho
+                {totalItems > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center">
+                    {totalItems}
+                  </Badge>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => {
+          {filteredProducts.map((product) => {
             const quantity = getCartQuantity(product.id);
             
             return (
-              <Card key={product.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={product.id} className="hover:shadow-lg transition-shadow flex flex-col">
+                {productImages[product.name] && (
+                  <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
+                    <img 
+                      src={productImages[product.name]} 
+                      alt={product.name}
+                      className="w-full h-full object-contain p-4 bg-muted/30"
+                    />
+                  </div>
+                )}
+                <CardHeader className="flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <Badge className={getCategoryColor(product.category)}>
                       {product.category}

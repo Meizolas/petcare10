@@ -1,4 +1,4 @@
-import { Syringe, Scissors, Heart, Stethoscope, Pill, Bath } from 'lucide-react';
+import { Syringe, Scissors, Heart, Stethoscope, Bath, Dog } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import {
@@ -59,6 +59,14 @@ export default function Servicos() {
       price: 'R$ 200,00',
       priceId: 'price_1SO4nDPSIQsRBK244b3uQsrX',
       color: 'from-primary to-secondary',
+    },
+    {
+      icon: Dog,
+      title: 'Adestramento',
+      description: 'Treinamento profissional para educar seu pet com técnicas modernas e eficazes.',
+      price: 'R$ 180,00',
+      priceId: 'price_adestramento',
+      color: 'from-accent to-brand-orange',
     },
   ];
 

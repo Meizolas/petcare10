@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import PetCareHeader from "./components/PetCareHeader";
 import PetCareFooter from "./components/PetCareFooter";
+import FloatingAiAssistant from "./components/FloatingAiAssistant";
 import PetCareHome from "./pages/PetCareHome";
 import Servicos from "./pages/Servicos";
 import Planos from "./pages/Planos";
@@ -32,6 +33,7 @@ const App = () => (
         <BrowserRouter>
           <div className="min-h-screen flex flex-col bg-background">
             <PetCareHeader />
+            <FloatingAiAssistant />
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<PetCareHome />} />

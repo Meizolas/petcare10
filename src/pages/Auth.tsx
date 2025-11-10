@@ -107,7 +107,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen gradient-hero flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-br from-primary to-accent mb-4">
@@ -139,7 +139,7 @@ export default function Auth() {
                     <Input
                       id="signin-email"
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder="email@exemplo.com"
                       value={signInData.email}
                       onChange={(e) => setSignInData({ ...signInData, email: e.target.value })}
                       className={errors.email ? 'border-destructive' : ''}
@@ -154,7 +154,7 @@ export default function Auth() {
                     <Input
                       id="signin-password"
                       type="password"
-                      placeholder="••••••"
+                      placeholder="Senha"
                       value={signInData.password}
                       onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
                       className={errors.password ? 'border-destructive' : ''}
@@ -191,7 +191,7 @@ export default function Auth() {
                     <Input
                       id="signup-name"
                       type="text"
-                      placeholder="Seu nome"
+                      placeholder="Nome completo"
                       value={signUpData.fullName}
                       onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
                       className={errors.fullName ? 'border-destructive' : ''}
@@ -206,7 +206,7 @@ export default function Auth() {
                     <Input
                       id="signup-email"
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder="email@exemplo.com"
                       value={signUpData.email}
                       onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
                       className={errors.email ? 'border-destructive' : ''}
@@ -221,7 +221,7 @@ export default function Auth() {
                     <Input
                       id="signup-phone"
                       type="tel"
-                      placeholder="(77) 98819-7912"
+                      placeholder="Telefone"
                       value={signUpData.phone}
                       onChange={(e) => setSignUpData({ ...signUpData, phone: e.target.value })}
                       className={errors.phone ? 'border-destructive' : ''}
@@ -236,7 +236,7 @@ export default function Auth() {
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="••••••"
+                      placeholder="Senha"
                       value={signUpData.password}
                       onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
                       className={errors.password ? 'border-destructive' : ''}

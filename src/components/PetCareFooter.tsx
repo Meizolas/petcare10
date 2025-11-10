@@ -47,6 +47,16 @@ export default function PetCareFooter() {
                   Contato
                 </Link>
               </li>
+              <li>
+                <Link to="/planos" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Planos
+                </Link>
+              </li>
+              <li>
+                <Link to="/medicamentos" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Medicamentos
+                </Link>
+              </li>
             </ul>
           </div>
 
