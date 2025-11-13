@@ -44,29 +44,32 @@ serve(async (req) => {
 
     console.log("Processing webhook for appointment:", appointmentId, "by user:", user.id);
 
-    // Get appointment data with user email
+    // Get appointment data
     const { data: appointment, error: appointmentError } = await supabase
       .from("appointments")
-      .select(`
-        *,
-        user:user_id (
-          email,
-          profiles (
-            full_name,
-            phone
-          )
-        )
-      `)
+      .select("*")
       .eq("id", appointmentId)
       .single();
 
-    if (appointmentError) {
+    if (appointmentError || !appointment) {
       console.error("Failed to fetch appointment:", appointmentError);
       return new Response(
         JSON.stringify({ success: false, error: "Appointment not found" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
       );
     }
+
+    // Get user profile data separately
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", appointment.user_id)
+      .single();
+
+    // Get user email from auth
+    const { data: appointmentUser } = await supabase.auth.admin.getUserById(
+      appointment.user_id
+    );
 
     // Verify appointment ownership or admin status
     const { data: userRole } = await supabase
@@ -117,7 +120,7 @@ serve(async (req) => {
     const horarioFormatado = format(brazilDate, "HH:mm");
     
     // Get email from either the userEmail parameter or from the user object
-    const email = userEmail || (appointment.user as any)?.email || "";
+    const email = userEmail || appointmentUser?.user?.email || "";
     
     const webhookPayload = {
       nome_tutor: appointment.tutor_name,
