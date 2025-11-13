@@ -79,9 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string, phone: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/auth`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -102,9 +102,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error };
       }
 
+      // Send custom confirmation email
+      if (data.user) {
+        try {
+          const confirmationUrl = `${window.location.origin}/auth?type=signup&token_hash=${data.session?.access_token}`;
+          await supabase.functions.invoke('send-confirmation-email', {
+            body: {
+              email,
+              confirmationUrl,
+            },
+          });
+        } catch (emailError) {
+          console.error('Error sending confirmation email:', emailError);
+        }
+      }
+
       toast({
         title: "Cadastro realizado!",
-        description: "Bem-vindo ao PetCare!",
+        description: "Verifique seu email para confirmar o cadastro.",
       });
 
       return { error: null };
@@ -115,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -127,6 +142,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           variant: "destructive",
         });
         return { error };
+      }
+
+      // Check if email is verified
+      if (data.user && !data.user.email_confirmed_at) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Email não verificado",
+          description: "Por favor, verifique seu email antes de fazer login. Verifique sua caixa de entrada e spam.",
+          variant: "destructive",
+        });
+        return { error: new Error("Email não verificado") };
       }
 
       toast({
