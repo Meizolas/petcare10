@@ -13,6 +13,7 @@ import Planos from "./pages/Planos";
 import Agendar from "./pages/Agendar";
 import Contato from "./pages/Contato";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import MinhaConta from "./pages/MinhaConta";
 import Admin from "./pages/Admin";
 import AdminCoupons from "./pages/AdminCoupons";
@@ -44,6 +45,7 @@ const App = () => (
                 <Route path="/agendar" element={<Agendar />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/minha-conta" element={<MinhaConta />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/cupons" element={<AdminCoupons />} />

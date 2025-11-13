@@ -3,3 +3,7 @@ project_id = "lwuweqqadnabwmmpredr"
 [functions.send-appointment-webhook]
 
 [functions.create-checkout]
+
+[functions.send-confirmation-email]
+
+[functions.send-reset-email]

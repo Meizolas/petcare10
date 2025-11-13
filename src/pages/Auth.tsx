@@ -201,12 +201,24 @@ export default function Auth() {
       setIsLoading(true);
 
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/auth`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (error) {
         toast.error('Erro ao enviar email de recuperação');
       } else {
+        // Send custom reset email
+        try {
+          await supabase.functions.invoke('send-reset-email', {
+            body: {
+              email: resetEmail,
+              resetUrl: `${window.location.origin}/reset-password`,
+            },
+          });
+        } catch (emailError) {
+          console.error('Error sending custom reset email:', emailError);
+        }
+
         toast.success('Email de recuperação enviado! Verifique sua caixa de entrada.');
         setShowResetForm(false);
         setResetEmail('');
