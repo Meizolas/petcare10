@@ -47,6 +47,7 @@ export default function Agendar() {
     'Banho Terapêutico',
     'Vermifugação',
     'Check-up Completo',
+    'Adestramento',
   ];
 
   const timeSlots = [
@@ -118,6 +119,25 @@ export default function Agendar() {
       const [hours, minutes] = formData.time.split(':');
       const appointmentDate = new Date(selectedDate);
       appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+      // Check if the time slot is already taken
+      const { data: existingAppointments, error: checkError } = await supabase
+        .from('appointments')
+        .select('id')
+        .eq('appointment_date', appointmentDate.toISOString())
+        .neq('status', 'cancelado');
+
+      if (checkError) throw checkError;
+
+      if (existingAppointments && existingAppointments.length > 0) {
+        toast({
+          title: 'Horário indisponível',
+          description: 'Este horário já está reservado. Por favor, escolha outro horário.',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
 
       // Insert appointment
       const { data: appointment, error: insertError } = await supabase
