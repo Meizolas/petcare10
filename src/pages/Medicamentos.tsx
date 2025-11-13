@@ -14,6 +14,9 @@ import meticortenImg from '@/assets/meticorten.jpg';
 import simparicImg from '@/assets/simparic.jpg';
 import revolutionImg from '@/assets/revolution.webp';
 import chemitalImg from '@/assets/chemital.webp';
+import rimadylImg from '@/assets/rimadyl.jpg';
+import colirioImg from '@/assets/colirio.jpg';
+import drontalImg from '@/assets/drontal.jpg';
 
 interface Product {
   id: string;
@@ -46,6 +49,9 @@ export default function Medicamentos() {
     'Simparic 20mg': simparicImg,
     'Revolution 6% Gatos': revolutionImg,
     'Chemital Gatos 4kg': chemitalImg,
+    'Anti-inflamatório Rimadyl': rimadylImg,
+    'Colírio Oftálmico Pet': colirioImg,
+    'Vermífugo Drontal Plus': drontalImg,
   };
 
   useEffect(() => {
