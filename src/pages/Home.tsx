@@ -29,9 +29,9 @@ const Home = () => {
   ];
 
   const upcomingAppointments = [
-    { type: 'Banho', date: '12/05/2024', pet: 'Rex' },
-    { type: 'Vacina', date: '15/05/2024', pet: 'Luna' },
-    { type: 'Consulta', date: '20/05/2024', pet: 'Max' },
+    { type: 'Banho e Tosa', date: '12/05/2024', pet: 'Rex' },
+    { type: 'Vacinação', date: '15/05/2024', pet: 'Luna' },
+    { type: 'Consulta Veterinária', date: '20/05/2024', pet: 'Max' },
   ];
 
   return (
