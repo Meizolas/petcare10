@@ -56,9 +56,7 @@ export default function Medicamentos() {
 
   useEffect(() => {
     loadProducts();
-    if (user) {
-      loadCart();
-    }
+    loadCart();
   }, [user]);
 
   const loadProducts = async () => {
@@ -83,16 +81,27 @@ export default function Medicamentos() {
   };
 
   const loadCart = async () => {
-    if (!user) return;
-    
     try {
-      const { data, error } = await supabase
-        .from('cart_items')
-        .select('product_id, quantity')
-        .eq('user_id', user.id);
+      if (user) {
+        const { data, error } = await supabase
+          .from('cart_items')
+          .select('product_id, quantity')
+          .eq('user_id', user.id);
 
-      if (error) throw error;
-      setCart(data || []);
+        if (error) throw error;
+        setCart(data || []);
+      } else {
+        // Load from localStorage
+        const localCart = localStorage.getItem('cart');
+        if (localCart) {
+          const cartIds = JSON.parse(localCart);
+          const items = Object.entries(cartIds).map(([productId, quantity]) => ({
+            product_id: productId,
+            quantity: quantity as number,
+          }));
+          setCart(items);
+        }
+      }
     } catch (error) {
       console.error('Error loading cart:', error);
     }
@@ -104,33 +113,38 @@ export default function Medicamentos() {
   };
 
   const updateCart = async (productId: string, quantity: number) => {
-    if (!user) {
-      toast({
-        title: 'Login necessário',
-        description: 'Faça login para adicionar produtos ao carrinho',
-        variant: 'destructive',
-      });
-      navigate('/auth');
-      return;
-    }
-
     try {
-      if (quantity === 0) {
-        await supabase
-          .from('cart_items')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('product_id', productId);
+      if (user) {
+        // Update in database
+        if (quantity === 0) {
+          await supabase
+            .from('cart_items')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('product_id', productId);
+        } else {
+          await supabase
+            .from('cart_items')
+            .upsert({
+              user_id: user.id,
+              product_id: productId,
+              quantity: quantity,
+            }, {
+              onConflict: 'user_id,product_id',
+            });
+        }
       } else {
-        await supabase
-          .from('cart_items')
-          .upsert({
-            user_id: user.id,
-            product_id: productId,
-            quantity: quantity,
-          }, {
-            onConflict: 'user_id,product_id',
-          });
+        // Update in localStorage
+        const localCart = localStorage.getItem('cart');
+        const cartIds = localCart ? JSON.parse(localCart) : {};
+        
+        if (quantity === 0) {
+          delete cartIds[productId];
+        } else {
+          cartIds[productId] = quantity;
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(cartIds));
       }
 
       await loadCart();
@@ -196,21 +210,19 @@ export default function Medicamentos() {
               </TabsList>
             </Tabs>
 
-            {user && (
-              <Button
-                onClick={() => navigate('/carrinho')}
-                size="lg"
-                className="relative w-full sm:w-auto"
-              >
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                Carrinho
-                {totalItems > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center">
-                    {totalItems}
-                  </Badge>
-                )}
-              </Button>
-            )}
+            <Button
+              onClick={() => navigate('/carrinho')}
+              size="lg"
+              className="relative w-full sm:w-auto"
+            >
+              <ShoppingCart className="h-5 w-5 mr-2" />
+              Carrinho
+              {totalItems > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center">
+                  {totalItems}
+                </Badge>
+              )}
+            </Button>
           </div>
         </div>
 

@@ -33,24 +33,41 @@ export default function Carrinho() {
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
     loadCart();
   }, [user]);
 
   const loadCart = async () => {
-    if (!user) return;
-
     try {
-      const { data, error } = await supabase
-        .from('cart_items')
-        .select('*, products(*)')
-        .eq('user_id', user.id);
+      if (user) {
+        // Load from database
+        const { data, error } = await supabase
+          .from('cart_items')
+          .select('*, products(*)')
+          .eq('user_id', user.id);
 
-      if (error) throw error;
-      setCartItems(data || []);
+        if (error) throw error;
+        setCartItems(data || []);
+      } else {
+        // Load from localStorage
+        const localCart = localStorage.getItem('cart');
+        if (localCart) {
+          const cartIds = JSON.parse(localCart);
+          const { data: products } = await supabase
+            .from('products')
+            .select('*')
+            .in('id', Object.keys(cartIds));
+
+          if (products) {
+            const items = products.map((product) => ({
+              id: product.id,
+              product_id: product.id,
+              quantity: cartIds[product.id],
+              products: product,
+            }));
+            setCartItems(items as any);
+          }
+        }
+      }
     } catch (error: any) {
       toast({
         title: 'Erro',
@@ -64,12 +81,21 @@ export default function Carrinho() {
 
   const removeItem = async (itemId: string) => {
     try {
-      const { error } = await supabase
-        .from('cart_items')
-        .delete()
-        .eq('id', itemId);
+      if (user) {
+        const { error } = await supabase
+          .from('cart_items')
+          .delete()
+          .eq('id', itemId);
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        const localCart = localStorage.getItem('cart');
+        if (localCart) {
+          const cartIds = JSON.parse(localCart);
+          delete cartIds[itemId];
+          localStorage.setItem('cart', JSON.stringify(cartIds));
+        }
+      }
       
       await loadCart();
       toast({
@@ -182,6 +208,21 @@ export default function Carrinho() {
 
   const checkout = async () => {
     if (cartItems.length === 0) return;
+
+    if (!user) {
+      // Save cart to localStorage and redirect to auth
+      const cartIds = cartItems.reduce((acc, item) => {
+        acc[item.product_id] = item.quantity;
+        return acc;
+      }, {} as any);
+      localStorage.setItem('cart', JSON.stringify(cartIds));
+      navigate('/auth');
+      toast({
+        title: 'Login necessário',
+        description: 'Faça login para finalizar sua compra',
+      });
+      return;
+    }
 
     setProcessing(true);
     try {
