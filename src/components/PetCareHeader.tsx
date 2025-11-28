@@ -32,7 +32,7 @@ export default function PetCareHeader() {
     }
   };
 
-  const navLinks = [
+  const navLinks = isAdmin ? [] : [
     { name: 'Início', href: '/' },
     { name: 'Serviços', href: '/servicos' },
     { name: 'Planos', href: '/planos' },
@@ -57,7 +57,7 @@ export default function PetCareHeader() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link) => (
+            {!isAdmin && navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
@@ -72,18 +72,20 @@ export default function PetCareHeader() {
             ))}
             {user ? (
               <>
-                <Link
-                  to="/minha-conta"
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-muted"
-                >
-                  <Avatar className="w-6 h-6">
-                    <AvatarImage src={avatarUrl || ''} />
-                    <AvatarFallback className="bg-purple-100 text-purple-600 text-xs">
-                      <User className="w-3 h-3" />
-                    </AvatarFallback>
-                  </Avatar>
-                  Minha Conta
-                </Link>
+                {!isAdmin && (
+                  <Link
+                    to="/minha-conta"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-muted"
+                  >
+                    <Avatar className="w-6 h-6">
+                      <AvatarImage src={avatarUrl || ''} />
+                      <AvatarFallback className="bg-purple-100 text-purple-600 text-xs">
+                        <User className="w-3 h-3" />
+                      </AvatarFallback>
+                    </Avatar>
+                    Minha Conta
+                  </Link>
+                )}
                 {isAdmin && (
                   <Link
                     to="/admin"
@@ -93,18 +95,21 @@ export default function PetCareHeader() {
                         : 'text-foreground hover:bg-muted'
                     }`}
                   >
-                    Admin
+                    Painel Admin
                   </Link>
                 )}
                 <ThemeToggle className="ml-2" />
               </>
             ) : (
-              <Link
-                to="/auth"
-                className="pet-button text-sm"
-              >
-                Entrar / Cadastrar
-              </Link>
+              <>
+                <ThemeToggle className="mr-2" />
+                <Link
+                  to="/auth"
+                  className="pet-button text-sm"
+                >
+                  Entrar / Cadastrar
+                </Link>
+              </>
             )}
           </nav>
 
@@ -121,7 +126,7 @@ export default function PetCareHeader() {
             <div className="flex justify-center mb-4">
               <ThemeToggle />
             </div>
-            {navLinks.map((link) => (
+            {!isAdmin && navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
@@ -137,18 +142,20 @@ export default function PetCareHeader() {
             ))}
             {user ? (
               <>
-                <Link
-                  to="/minha-conta"
-                  className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                    isActive('/minha-conta')
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-foreground hover:bg-muted'
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <User className="h-4 w-4 inline mr-2" />
-                  Minha Conta
-                </Link>
+                {!isAdmin && (
+                  <Link
+                    to="/minha-conta"
+                    className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      isActive('/minha-conta')
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-foreground hover:bg-muted'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="h-4 w-4 inline mr-2" />
+                    Minha Conta
+                  </Link>
+                )}
                 {isAdmin && (
                   <Link
                     to="/admin"
@@ -159,7 +166,7 @@ export default function PetCareHeader() {
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Admin
+                    Painel Admin
                   </Link>
                 )}
               </>
