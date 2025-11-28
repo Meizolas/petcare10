@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Package, User, Calendar as CalendarIcon, DollarSign, Tag, ShoppingBag } from 'lucide-react';
+import { Package, User, Calendar as CalendarIcon, DollarSign } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import AdminLayout from '@/components/AdminLayout';
 
 interface Order {
   id: string;
@@ -131,33 +131,9 @@ export default function AdminOrders() {
   }
 
   return (
-    <div className="min-h-screen py-20 bg-background">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-4xl font-bold mb-4">Painel Administrativo</h1>
-        
-        {/* Admin Navigation */}
-        <div className="flex gap-4 mb-8">
-          <Link to="/admin">
-            <Button variant="outline">
-              <CalendarIcon className="h-4 w-4 mr-2" />
-              Agendamentos
-            </Button>
-          </Link>
-          <Link to="/admin/cupons">
-            <Button variant="outline">
-              <Tag className="h-4 w-4 mr-2" />
-              Cupons
-            </Button>
-          </Link>
-          <Link to="/admin/pedidos">
-            <Button variant="default">
-              <ShoppingBag className="h-4 w-4 mr-2" />
-              Pedidos
-            </Button>
-          </Link>
-        </div>
-
-        <h2 className="text-2xl font-bold mb-8">Logs de Pedidos</h2>
+    <AdminLayout>
+      <div className="space-y-8">
+        <h1 className="text-4xl font-bold">Compras de Medicamentos</h1>
 
         <div className="grid gap-4">
           {orders.map((order) => (
@@ -236,6 +212,6 @@ export default function AdminOrders() {
           ))}
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

@@ -8,6 +8,8 @@ import { CartProvider } from "./contexts/CartContext";
 import PetCareHeader from "./components/PetCareHeader";
 import PetCareFooter from "./components/PetCareFooter";
 import FloatingAiAssistant from "./components/FloatingAiAssistant";
+import AdminRoute from "./components/AdminRoute";
+import UserRoute from "./components/UserRoute";
 import PetCareHome from "./pages/PetCareHome";
 import Servicos from "./pages/Servicos";
 import Planos from "./pages/Planos";
@@ -39,20 +41,27 @@ const App = () => (
             <FloatingAiAssistant />
             <main className="flex-1">
               <Routes>
-                <Route path="/" element={<PetCareHome />} />
-                <Route path="/servicos" element={<Servicos />} />
-                <Route path="/planos" element={<Planos />} />
-                <Route path="/medicamentos" element={<Medicamentos />} />
-                <Route path="/carrinho" element={<Carrinho />} />
-                <Route path="/agendar" element={<Agendar />} />
-                <Route path="/contato" element={<Contato />} />
+                {/* User Routes */}
+                <Route path="/" element={<UserRoute><PetCareHome /></UserRoute>} />
+                <Route path="/servicos" element={<UserRoute><Servicos /></UserRoute>} />
+                <Route path="/planos" element={<UserRoute><Planos /></UserRoute>} />
+                <Route path="/medicamentos" element={<UserRoute><Medicamentos /></UserRoute>} />
+                <Route path="/carrinho" element={<UserRoute><Carrinho /></UserRoute>} />
+                <Route path="/agendar" element={<UserRoute><Agendar /></UserRoute>} />
+                <Route path="/contato" element={<UserRoute><Contato /></UserRoute>} />
+                <Route path="/minha-conta" element={<UserRoute><MinhaConta /></UserRoute>} />
+                <Route path="/payment-success" element={<UserRoute><PaymentSuccess /></UserRoute>} />
+                
+                {/* Auth Routes (accessible to all) */}
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/minha-conta" element={<MinhaConta />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/cupons" element={<AdminCoupons />} />
-                <Route path="/admin/pedidos" element={<AdminOrders />} />
-                <Route path="/payment-success" element={<PaymentSuccess />} />
+                
+                {/* Admin Routes */}
+                <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+                <Route path="/admin/cupons" element={<AdminRoute><AdminCoupons /></AdminRoute>} />
+                <Route path="/admin/pedidos" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+                
+                {/* 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

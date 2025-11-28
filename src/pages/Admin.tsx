@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { Calendar, CheckCircle, Clock, Phone, User, PawPrint, Loader2, Tag, ShoppingBag } from "lucide-react";
+import { Loader2, TrendingUp, Calendar, ShoppingBag } from "lucide-react";
+import AdminLayout from "@/components/AdminLayout";
+import AdminKanban from "@/components/AdminKanban";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Appointment {
   id: string;
@@ -59,6 +57,7 @@ export default function Admin() {
   }, [user, isAdmin, navigate]);
 
   const fetchAppointments = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from("appointments")
@@ -80,215 +79,113 @@ export default function Admin() {
     }
   };
 
-  const handleConfirmAppointment = async (appointmentId: string) => {
-    try {
-      // Get appointment details with user email
-      const { data: appointment, error: appointmentError } = await supabase
-        .from("appointments")
-        .select(`
-          *,
-          user:user_id (
-            email,
-            profiles (
-              full_name,
-              phone
-            )
-          )
-        `)
-        .eq("id", appointmentId)
-        .single();
-
-      if (appointmentError) {
-        throw appointmentError;
-      }
-
-      // Update status to confirmed
-      const { error: updateError } = await supabase
-        .from("appointments")
-        .update({ status: "confirmed" })
-        .eq("id", appointmentId);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      // Trigger webhook with confirmation data
-      const { data: functionData, error: functionError } = await supabase.functions.invoke(
-        "send-appointment-webhook",
-        {
-          body: { 
-            appointmentId,
-            confirmed: true,
-            userEmail: (appointment.user as unknown as UserWithProfile)?.email || ""
-          },
-        }
-      );
-
-      if (functionError) {
-        console.error("Error triggering webhook:", functionError);
-        toast({
-          title: "Atenção",
-          description: "Agendamento confirmado, mas houve erro ao enviar notificação.",
-          variant: "destructive",
-        });
-      } else {
-        console.log("Webhook triggered successfully:", functionData);
-        toast({
-          title: "Sucesso!",
-          description: "Agendamento confirmado e notificação enviada.",
-        });
-      }
-
-      // Refresh appointments
-      fetchAppointments();
-    } catch (error) {
-      console.error("Error confirming appointment:", error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível confirmar o agendamento.",
-        variant: "destructive",
-      });
-    }
+  const getStats = () => {
+    const pending = appointments.filter(a => a.status === 'pending').length;
+    const confirmed = appointments.filter(a => a.status === 'confirmed').length;
+    const completed = appointments.filter(a => a.status === 'completed').length;
+    const total = appointments.length;
+    
+    return { pending, confirmed, completed, total };
   };
 
-  const getStatusBadge = (status: string) => {
-    if (status === "confirmed") {
-      return (
-        <Badge className="bg-gradient-to-r from-accent to-primary text-white border-0 px-4 py-1">
-          <CheckCircle className="w-3 h-3 mr-1" />
-          Confirmado
-        </Badge>
-      );
-    }
+  if (loading) {
     return (
-      <Badge variant="outline" className="border-2 border-secondary text-secondary px-4 py-1">
-        <Clock className="w-3 h-3 mr-1" />
-        Pendente
-      </Badge>
+      <AdminLayout>
+        <div className="flex flex-col justify-center items-center h-96 space-y-4">
+          <Loader2 className="h-12 w-12 text-primary animate-spin" />
+          <div className="text-lg text-muted-foreground">Carregando dados...</div>
+        </div>
+      </AdminLayout>
     );
-  };
+  }
+
+  const stats = getStats();
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Painel Administrativo
-          </h1>
-          
-          {/* Admin Navigation */}
-          <div className="flex gap-4 mb-8">
-            <Link to="/admin">
-              <Button variant="default">
-                <Calendar className="h-4 w-4 mr-2" />
-                Agendamentos
-              </Button>
-            </Link>
-            <Link to="/admin/cupons">
-              <Button variant="outline">
-                <Tag className="h-4 w-4 mr-2" />
-                Cupons
-              </Button>
-            </Link>
-            <Link to="/admin/pedidos">
-              <Button variant="outline">
-                <ShoppingBag className="h-4 w-4 mr-2" />
-                Pedidos
-              </Button>
-            </Link>
+    <AdminLayout>
+      <div className="space-y-8">
+        {/* Dashboard Stats */}
+        <div>
+          <h1 className="text-4xl font-bold mb-6">Dashboard</h1>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total de Agendamentos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-bold">{stats.total}</div>
+                  <Calendar className="h-8 w-8 text-muted-foreground" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Aguardando Confirmação
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-bold text-yellow-600">{stats.pending}</div>
+                  <TrendingUp className="h-8 w-8 text-yellow-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Confirmados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-bold text-green-600">{stats.confirmed}</div>
+                  <Calendar className="h-8 w-8 text-green-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Finalizados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-bold text-blue-600">{stats.completed}</div>
+                  <ShoppingBag className="h-8 w-8 text-blue-600" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex flex-col justify-center items-center h-64 space-y-4">
-            <Loader2 className="h-12 w-12 text-primary animate-spin" />
-            <div className="text-lg text-muted-foreground">Carregando agendamentos...</div>
-          </div>
-        ) : appointments.length === 0 ? (
-          <Card className="text-center py-16 border-2 border-dashed">
-            <CardContent>
-              <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <p className="text-xl font-semibold text-foreground mb-2">
-                Nenhum agendamento encontrado
-              </p>
-              <p className="text-muted-foreground">
-                Os novos agendamentos aparecerão aqui automaticamente
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {appointments.map((appointment) => (
-              <Card 
-                key={appointment.id} 
-                className="hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50 hover:scale-[1.02] overflow-hidden"
-              >
-                <div className={`h-2 ${appointment.status === 'confirmed' ? 'bg-gradient-to-r from-accent to-primary' : 'bg-gradient-to-r from-secondary to-primary'}`} />
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-primary/10 rounded-lg icon-float">
-                        <Calendar className="h-5 w-5 text-primary" />
-                      </div>
-                      <span className="text-lg font-bold">{appointment.service}</span>
-                    </div>
-                    {getStatusBadge(appointment.status)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                      <User className="h-5 w-5 text-primary flex-shrink-0 icon-float" />
-                      <div>
-                        <p className="text-xs text-muted-foreground font-medium">Tutor</p>
-                        <p className="font-semibold">{appointment.tutor_name}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                      <PawPrint className="h-5 w-5 text-secondary flex-shrink-0 icon-float" />
-                      <div>
-                        <p className="text-xs text-muted-foreground font-medium">Pet</p>
-                        <p className="font-semibold">{appointment.pet_name}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                      <Phone className="h-5 w-5 text-accent flex-shrink-0 icon-float" />
-                      <div>
-                        <p className="text-xs text-muted-foreground font-medium">Telefone</p>
-                        <p className="font-semibold">{appointment.phone}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                      <Clock className="h-5 w-5 text-primary flex-shrink-0 icon-float" />
-                      <div>
-                        <p className="text-xs text-muted-foreground font-medium">Data e Hora</p>
-                        <p className="font-semibold">
-                          {format(new Date(appointment.appointment_date), "dd/MM/yyyy 'às' HH:mm", {
-                            locale: ptBR,
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {appointment.status === "pending" && (
-                    <Button
-                      onClick={() => handleConfirmAppointment(appointment.id)}
-                      className="w-full bg-gradient-to-r from-primary via-primary to-accent hover:brightness-110 text-white font-semibold py-6 rounded-xl transition-all hover:shadow-lg hover:shadow-primary/50 hover:scale-105"
-                    >
-                      <CheckCircle className="w-5 h-5 mr-2" />
-                      Confirmar Agendamento
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+        {/* Kanban Board */}
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Kanban de Agendamentos</h2>
+          {appointments.length === 0 ? (
+            <Card className="text-center py-16 border-2 border-dashed">
+              <CardContent>
+                <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <p className="text-xl font-semibold text-foreground mb-2">
+                  Nenhum agendamento encontrado
+                </p>
+                <p className="text-muted-foreground">
+                  Os novos agendamentos aparecerão aqui automaticamente
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <AdminKanban appointments={appointments} onUpdate={fetchAppointments} />
+          )}
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
