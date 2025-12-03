@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import PetCareHeader from "./components/PetCareHeader";
@@ -28,6 +28,45 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      {!isAdminRoute && <PetCareHeader />}
+      {!isAdminRoute && <FloatingAiAssistant />}
+      <main className="flex-1">
+        <Routes>
+          {/* User Routes */}
+          <Route path="/" element={<UserRoute><PetCareHome /></UserRoute>} />
+          <Route path="/servicos" element={<UserRoute><Servicos /></UserRoute>} />
+          <Route path="/planos" element={<UserRoute><Planos /></UserRoute>} />
+          <Route path="/medicamentos" element={<UserRoute><Medicamentos /></UserRoute>} />
+          <Route path="/carrinho" element={<UserRoute><Carrinho /></UserRoute>} />
+          <Route path="/agendar" element={<UserRoute><Agendar /></UserRoute>} />
+          <Route path="/contato" element={<UserRoute><Contato /></UserRoute>} />
+          <Route path="/minha-conta" element={<UserRoute><MinhaConta /></UserRoute>} />
+          <Route path="/payment-success" element={<UserRoute><PaymentSuccess /></UserRoute>} />
+          
+          {/* Auth Routes (accessible to all) */}
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/admin/cupons" element={<AdminRoute><AdminCoupons /></AdminRoute>} />
+          <Route path="/admin/pedidos" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+          
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      {!isAdminRoute && <PetCareFooter />}
+    </div>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -36,37 +75,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-          <div className="min-h-screen flex flex-col bg-background">
-            <PetCareHeader />
-            <FloatingAiAssistant />
-            <main className="flex-1">
-              <Routes>
-                {/* User Routes */}
-                <Route path="/" element={<UserRoute><PetCareHome /></UserRoute>} />
-                <Route path="/servicos" element={<UserRoute><Servicos /></UserRoute>} />
-                <Route path="/planos" element={<UserRoute><Planos /></UserRoute>} />
-                <Route path="/medicamentos" element={<UserRoute><Medicamentos /></UserRoute>} />
-                <Route path="/carrinho" element={<UserRoute><Carrinho /></UserRoute>} />
-                <Route path="/agendar" element={<UserRoute><Agendar /></UserRoute>} />
-                <Route path="/contato" element={<UserRoute><Contato /></UserRoute>} />
-                <Route path="/minha-conta" element={<UserRoute><MinhaConta /></UserRoute>} />
-                <Route path="/payment-success" element={<UserRoute><PaymentSuccess /></UserRoute>} />
-                
-                {/* Auth Routes (accessible to all) */}
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-                <Route path="/admin/cupons" element={<AdminRoute><AdminCoupons /></AdminRoute>} />
-                <Route path="/admin/pedidos" element={<AdminRoute><AdminOrders /></AdminRoute>} />
-                
-                {/* 404 */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <PetCareFooter />
-          </div>
+            <AppContent />
           </BrowserRouter>
         </TooltipProvider>
       </CartProvider>
