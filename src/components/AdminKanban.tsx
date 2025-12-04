@@ -45,9 +45,28 @@ export default function AdminKanban({ appointments, onUpdate }: AdminKanbanProps
 
       if (error) throw error;
 
+      // Send status webhook for confirmed or cancelled
+      if (newStatus === 'confirmed' || newStatus === 'cancelled') {
+        try {
+          await supabase.functions.invoke('send-status-webhook', {
+            body: { appointmentId, newStatus },
+          });
+          console.log('Status webhook sent successfully');
+        } catch (webhookError) {
+          console.error('Status webhook error:', webhookError);
+        }
+      }
+
+      const statusMessages: Record<string, string> = {
+        'confirmed': 'Agendamento aprovado com sucesso!',
+        'cancelled': 'Agendamento recusado.',
+        'completed': 'Agendamento finalizado.',
+        'pending': 'Agendamento movido para pendente.',
+      };
+
       toast({
         title: 'Status atualizado!',
-        description: 'O agendamento foi movido com sucesso.',
+        description: statusMessages[newStatus] || 'O agendamento foi movido com sucesso.',
       });
 
       onUpdate();
