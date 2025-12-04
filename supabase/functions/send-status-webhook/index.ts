@@ -7,6 +7,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const STATUS_WEBHOOK_URL = "https://webhook.vps.bastmed.com.br/webhook/status";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -40,9 +42,25 @@ serve(async (req) => {
       );
     }
 
-    const { appointmentId, confirmed = false, userEmail = "" } = await req.json();
+    // Verify admin role
+    const { data: userRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
 
-    console.log("Processing webhook for appointment:", appointmentId, "by user:", user.id);
+    if (!userRole) {
+      console.error("User is not admin:", user.id);
+      return new Response(
+        JSON.stringify({ success: false, error: "Forbidden: Admin access required" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
+      );
+    }
+
+    const { appointmentId, newStatus } = await req.json();
+
+    console.log("Processing status webhook for appointment:", appointmentId, "new status:", newStatus);
 
     // Get appointment data
     const { data: appointment, error: appointmentError } = await supabase
@@ -59,86 +77,41 @@ serve(async (req) => {
       );
     }
 
-    // Get user profile data separately
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name, phone")
-      .eq("id", appointment.user_id)
-      .single();
-
     // Get user email from auth
     const { data: appointmentUser } = await supabase.auth.admin.getUserById(
       appointment.user_id
     );
 
-    // Verify appointment ownership or admin status
-    const { data: userRole } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    const isAdmin = !!userRole;
-    const isOwner = appointment.user_id === user.id;
-
-    if (!isOwner && !isAdmin) {
-      console.error("Authorization failed: User", user.id, "attempted to access appointment", appointmentId);
-      return new Response(
-        JSON.stringify({ success: false, error: "Forbidden: You don't have permission to trigger webhook for this appointment" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 403 }
-      );
-    }
-
-    console.log("Authorization passed:", isAdmin ? "Admin access" : "Owner access");
-
-    // Get webhook config
-    const { data: config, error: configError } = await supabase
-      .from("webhook_config")
-      .select("*")
-      .eq("is_active", true)
-      .limit(1)
-      .maybeSingle();
-
-    if (configError) {
-      throw new Error(`Failed to fetch webhook config: ${configError.message}`);
-    }
-
-    if (!config) {
-      console.log("No active webhook configured");
-      return new Response(
-        JSON.stringify({ success: false, message: "No active webhook configured" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-      );
-    }
-
-    // Format data for webhook - adjust from UTC to Brazil timezone (UTC-3)
+    // Format date for webhook - adjust from UTC to Brazil timezone (UTC-3)
     const appointmentDate = new Date(appointment.appointment_date);
-    // Convert from UTC to Brazil timezone (subtract 3 hours from UTC)
     const brazilDate = new Date(appointmentDate.getTime() - (3 * 60 * 60 * 1000));
     const dataFormatada = format(brazilDate, "dd/MM/yyyy");
     const horarioFormatado = format(brazilDate, "HH:mm");
-    const dataCompleta = `${dataFormatada} ${horarioFormatado}`;
-    
-    // Get email from either the userEmail parameter or from the user object
-    const email = userEmail || appointmentUser?.user?.email || "";
-    
+
+    // Map status to Portuguese
+    const statusMap: Record<string, string> = {
+      'confirmed': 'aprovado',
+      'cancelled': 'recusado',
+      'completed': 'finalizado',
+      'pending': 'pendente'
+    };
+
     const webhookPayload = {
       nome_tutor: appointment.tutor_name,
       nome_pet: appointment.pet_name,
       telefone: appointment.phone,
       servico: appointment.service,
-      data_completa: dataCompleta,
       data: dataFormatada,
       horario: horarioFormatado,
-      email: email,
-      confirmado: confirmed,
+      status: statusMap[newStatus] || newStatus,
+      email: appointmentUser?.user?.email || "",
     };
 
-    console.log("Sending to webhook:", config.webhook_url);
+    console.log("Sending to status webhook:", STATUS_WEBHOOK_URL);
+    console.log("Payload:", JSON.stringify(webhookPayload));
 
     // Send to webhook
-    const webhookResponse = await fetch(config.webhook_url, {
+    const webhookResponse = await fetch(STATUS_WEBHOOK_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -149,7 +122,7 @@ serve(async (req) => {
     const responseText = await webhookResponse.text();
     const success = webhookResponse.ok;
 
-    console.log("Webhook response:", {
+    console.log("Status webhook response:", {
       status: webhookResponse.status,
       success,
       body: responseText,
@@ -159,14 +132,14 @@ serve(async (req) => {
     await supabase.from("webhook_logs").insert({
       appointment_id: appointmentId,
       status: success ? "success" : "failed",
-      response: responseText,
+      response: `Status change to ${newStatus}: ${responseText}`,
     });
 
     return new Response(
       JSON.stringify({
         success,
         status: webhookResponse.status,
-        message: success ? "Webhook sent successfully" : "Webhook failed",
+        message: success ? "Status webhook sent successfully" : "Status webhook failed",
         response: responseText,
       }),
       {
@@ -175,7 +148,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("Error in webhook function:", error);
+    console.error("Error in status webhook function:", error);
     
     return new Response(
       JSON.stringify({

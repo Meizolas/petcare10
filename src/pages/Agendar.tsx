@@ -13,11 +13,12 @@ import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { z } from 'zod';
+import { formatPhoneWithDDI, getPhoneNumbers, initializePhone, validatePhone } from '@/utils/phoneMask';
 
 const appointmentSchema = z.object({
   tutorName: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
   petName: z.string().min(2, 'Nome do pet deve ter pelo menos 2 caracteres'),
-  phone: z.string().min(10, 'Telefone inválido'),
+  phone: z.string().refine(validatePhone, 'Telefone inválido. Use o formato +55 (XX) XXXXX-XXXX'),
   service: z.string().min(1, 'Selecione um serviço'),
   date: z.date({ required_error: 'Selecione uma data' }),
   time: z.string().min(1, 'Selecione um horário'),
@@ -35,10 +36,11 @@ export default function Agendar() {
   const [formData, setFormData] = useState({
     tutorName: '',
     petName: '',
-    phone: '',
+    phone: '+55 ',
     service: '',
     time: '',
   });
+  const [unavailableTimes, setUnavailableTimes] = useState<string[]>([]);
 
   const services = [
     'Consulta Veterinária',
@@ -84,9 +86,46 @@ export default function Agendar() {
       setFormData((prev) => ({
         ...prev,
         tutorName: data.full_name || '',
-        phone: data.phone || '',
+        phone: data.phone ? initializePhone(data.phone) : '+55 ',
       }));
     }
+  };
+
+  // Load unavailable times when date changes
+  useEffect(() => {
+    if (selectedDate) {
+      loadUnavailableTimes(selectedDate);
+    }
+  }, [selectedDate]);
+
+  const loadUnavailableTimes = async (date: Date) => {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const { data: confirmedAppointments } = await supabase
+      .from('appointments')
+      .select('appointment_date')
+      .gte('appointment_date', startOfDay.toISOString())
+      .lte('appointment_date', endOfDay.toISOString())
+      .eq('status', 'confirmed');
+
+    if (confirmedAppointments) {
+      const times = confirmedAppointments.map(app => {
+        const appointmentDate = new Date(app.appointment_date);
+        return format(appointmentDate, 'HH:mm');
+      });
+      setUnavailableTimes(times);
+    } else {
+      setUnavailableTimes([]);
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneWithDDI(e.target.value);
+    setFormData({ ...formData, phone: formatted });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,12 +159,12 @@ export default function Agendar() {
       const appointmentDate = new Date(selectedDate);
       appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
-      // Check if the time slot is already taken
+      // Check if the time slot is already taken by a confirmed appointment
       const { data: existingAppointments, error: checkError } = await supabase
         .from('appointments')
         .select('id')
         .eq('appointment_date', appointmentDate.toISOString())
-        .neq('status', 'cancelado');
+        .eq('status', 'confirmed');
 
       if (checkError) throw checkError;
 
@@ -253,12 +292,13 @@ export default function Agendar() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Telefone</Label>
+                  <Label htmlFor="phone">Telefone (com DDI)</Label>
                   <Input
                     id="phone"
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={handlePhoneChange}
+                    placeholder="+55 (11) 99999-9999"
                     className={errors.phone ? 'border-destructive' : ''}
                   />
                   {errors.phone && (
@@ -323,11 +363,19 @@ export default function Agendar() {
                       <SelectValue placeholder="Selecione um horário" />
                     </SelectTrigger>
                     <SelectContent>
-                      {timeSlots.map((time) => (
-                        <SelectItem key={time} value={time}>
-                          {time}
-                        </SelectItem>
-                      ))}
+                      {timeSlots.map((time) => {
+                        const isUnavailable = unavailableTimes.includes(time);
+                        return (
+                          <SelectItem 
+                            key={time} 
+                            value={time}
+                            disabled={isUnavailable}
+                            className={isUnavailable ? 'text-muted-foreground line-through' : ''}
+                          >
+                            {time} {isUnavailable && '(Ocupado)'}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                   {errors.time && (
