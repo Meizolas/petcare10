@@ -7,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const STATUS_WEBHOOK_URL = "https://webhook.vps.bastmed.com.br/webhook/status";
+const STATUS_WEBHOOK_URL = "https://automacao.agenciaatomo.com.br/webhook/status";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
